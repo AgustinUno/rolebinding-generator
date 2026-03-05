@@ -6,749 +6,424 @@
 <title>ENIC · tools.ts Generator</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0d0d0f; --surface: #141416; --surface2: #18181c;
+  --border: #222228; --border2: #2e2e38;
+  --text: #e8e8ec; --muted: #52525e; --muted2: #7a7a8a;
+  --accent: #6c8eff; --accent-dim: #151d38; --accent-glow: rgba(108,142,255,0.15);
+  --green: #4ade80; --green-dim: #0c1f14;
+  --red: #f87171; --red-dim: #250d0d;
+  --mono: 'JetBrains Mono', monospace;
+  --sans: 'DM Sans', sans-serif;
+  --r: 6px;
+}
+body { font-family: var(--sans); background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-  :root {
-    --bg: #0d0d0f;
-    --surface: #141416;
-    --border: #1e1e22;
-    --border-hover: #2e2e34;
-    --text: #e8e8ec;
-    --muted: #5a5a6a;
-    --accent: #6c8eff;
-    --accent-dim: #1a2140;
-    --green: #4ade80;
-    --green-dim: #0d2018;
-    --red: #f87171;
-    --red-dim: #2a0f0f;
-    --amber: #fbbf24;
-    --amber-dim: #2a1f08;
-    --mono: 'JetBrains Mono', monospace;
-    --sans: 'DM Sans', sans-serif;
-    --radius: 8px;
-  }
+/* Header */
+header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 24px; height: 52px; flex-shrink: 0;
+  background: var(--surface); border-bottom: 1px solid var(--border);
+}
+.logo { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; }
+.dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 6px var(--accent); animation: blink 2s ease-in-out infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+.pill { font-family: var(--mono); font-size: 10px; padding: 2px 7px; border-radius: 20px; background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(108,142,255,.25); }
+.header-hint { font-size: 11px; color: var(--muted); }
 
-  body {
-    font-family: var(--sans);
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-  }
+/* Layout */
+.layout { display: grid; grid-template-columns: 480px 1fr; flex: 1; overflow: hidden; }
 
-  /* ── Header ── */
-  header {
-    border-bottom: 1px solid var(--border);
-    padding: 16px 32px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: var(--surface);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-  .logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-weight: 600;
-    font-size: 14px;
-    letter-spacing: 0.02em;
-  }
-  .logo-dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: var(--accent);
-    box-shadow: 0 0 8px var(--accent);
-    animation: pulse 2s ease-in-out infinite;
-  }
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.4; }
-  }
-  .badge {
-    font-family: var(--mono);
-    font-size: 10px;
-    padding: 2px 8px;
-    border-radius: 100px;
-    background: var(--accent-dim);
-    color: var(--accent);
-    border: 1px solid rgba(108,142,255,0.2);
-  }
+/* Left panel */
+.left { display: flex; flex-direction: column; border-right: 1px solid var(--border); overflow: hidden; }
+.left-toolbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-bottom: 1px solid var(--border); flex-shrink: 0; background: var(--surface); }
+.left-body { flex: 1; overflow-y: auto; padding: 16px 20px; }
 
-  /* ── Layout ── */
-  .container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0;
-    flex: 1;
-    min-height: 0;
-  }
+/* Right panel */
+.right { display: flex; flex-direction: column; overflow: hidden; }
+.right-toolbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-bottom: 1px solid var(--border); flex-shrink: 0; background: var(--surface); }
+.right-body { flex: 1; overflow: auto; padding: 20px 24px; }
 
-  /* ── Panel ── */
-  .panel {
-    padding: 28px 32px;
-    overflow-y: auto;
-    border-right: 1px solid var(--border);
-  }
-  .panel:last-child { border-right: none; }
+/* Section label */
+.slabel { font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
 
-  .panel-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 24px;
-  }
-  .panel-title {
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
+/* Input */
+input[type=text], select, textarea {
+  width: 100%; background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 7px 11px; font-family: var(--sans);
+  font-size: 13px; color: var(--text); outline: none; transition: border-color .15s;
+}
+input[type=text]:focus, select:focus, textarea:focus { border-color: var(--accent); }
+input::placeholder, textarea::placeholder { color: var(--muted); }
+select option { background: #1a1a20; }
 
-  /* ── Sections ── */
-  .section {
-    margin-bottom: 32px;
-  }
-  .section-label {
-    font-size: 11px;
-    font-weight: 500;
-    color: var(--muted);
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    margin-bottom: 10px;
-  }
+/* Add form */
+.add-form {
+  background: rgba(108,142,255,.04); border: 1px dashed rgba(108,142,255,.25);
+  border-radius: var(--r); padding: 16px; margin-bottom: 14px;
+}
+.field { margin-bottom: 10px; }
+.field:last-child { margin-bottom: 0; }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
 
-  /* ── Inputs ── */
-  input[type="text"], select {
-    width: 100%;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 8px 12px;
-    font-family: var(--sans);
-    font-size: 13px;
-    color: var(--text);
-    outline: none;
-    transition: border-color 0.15s;
-  }
-  input[type="text"]:focus, select:focus {
-    border-color: var(--accent);
-  }
-  input[type="text"]::placeholder { color: var(--muted); }
-  select option { background: #1a1a1e; }
+/* Role chips */
+.chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.chip {
+  font-size: 11px; padding: 3px 9px; border-radius: 20px;
+  border: 1px solid var(--border); background: var(--surface2);
+  cursor: pointer; user-select: none; transition: all .12s;
+}
+.chip:hover { border-color: var(--border2); }
+.chip.on { border-color: var(--accent); background: var(--accent-dim); color: var(--accent); }
 
-  /* ── Role Checkboxes ── */
-  .roles-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-  }
-  .role-chip {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 4px 10px;
-    border-radius: 100px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    font-size: 12px;
-    cursor: pointer;
-    transition: all 0.15s;
-    user-select: none;
-  }
-  .role-chip input { display: none; }
-  .role-chip:hover { border-color: var(--border-hover); }
-  .role-chip.active {
-    border-color: var(--accent);
-    background: var(--accent-dim);
-    color: var(--accent);
-  }
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 6px 13px; border-radius: var(--r); font-family: var(--sans);
+  font-size: 12px; font-weight: 500; cursor: pointer; border: 1px solid transparent; transition: all .15s;
+}
+.btn-ghost { background: transparent; border-color: var(--border); color: var(--muted2); }
+.btn-ghost:hover { border-color: var(--border2); color: var(--text); }
+.btn-accent { background: var(--accent); color: #fff; }
+.btn-accent:hover { opacity: .85; }
+.btn-green { background: var(--green); color: #0a0a0a; font-weight: 600; }
+.btn-green:hover { opacity: .85; }
+.btn-red { background: transparent; border-color: transparent; color: var(--red); padding: 4px 8px; }
+.btn-red:hover { background: var(--red-dim); }
+.btn-sm { padding: 4px 9px; font-size: 11px; }
+.row { display: flex; align-items: center; gap: 8px; }
 
-  /* ── Tool Cards ── */
-  .tools-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-  .tool-card {
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    background: var(--surface);
-    overflow: hidden;
-    transition: border-color 0.15s;
-  }
-  .tool-card:hover { border-color: var(--border-hover); }
-  .tool-card-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 14px;
-    cursor: pointer;
-  }
-  .tool-card-left {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .tool-index {
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--muted);
-    width: 18px;
-  }
-  .tool-name {
-    font-size: 13px;
-    font-weight: 500;
-  }
-  .tool-url {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--muted);
-    margin-left: 4px;
-  }
-  .tool-card-actions {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .subtool-count {
-    font-size: 10px;
-    padding: 2px 6px;
-    border-radius: 100px;
-    background: var(--accent-dim);
-    color: var(--accent);
-    font-family: var(--mono);
-  }
+/* Tool cards */
+.tool-card { border: 1px solid var(--border); border-radius: var(--r); background: var(--surface); margin-bottom: 8px; overflow: hidden; }
+.tool-card:hover { border-color: var(--border2); }
+.card-header { display: flex; align-items: center; justify-content: space-between; padding: 9px 13px; cursor: pointer; }
+.card-left { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.card-num { font-family: var(--mono); font-size: 10px; color: var(--muted); min-width: 18px; }
+.card-title { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card-url { font-family: var(--mono); font-size: 11px; color: var(--muted); margin-left: 4px; white-space: nowrap; }
+.card-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.sub-badge { font-size: 10px; padding: 2px 6px; border-radius: 20px; background: var(--accent-dim); color: var(--accent); font-family: var(--mono); }
 
-  /* ── Subtools ── */
-  .subtools-area {
-    border-top: 1px solid var(--border);
-    padding: 10px 14px 14px;
-    background: rgba(0,0,0,0.2);
-  }
-  .subtool-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 0;
-    border-bottom: 1px solid var(--border);
-  }
-  .subtool-row:last-child { border-bottom: none; }
-  .subtool-row input[type="text"] {
-    flex: 1;
-    padding: 5px 10px;
-    font-size: 12px;
-  }
-  .subtool-role-mini {
-    display: flex;
-    gap: 4px;
-  }
-  .mini-chip {
-    font-size: 10px;
-    padding: 2px 6px;
-    border-radius: 100px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    cursor: pointer;
-    transition: all 0.12s;
-    user-select: none;
-    white-space: nowrap;
-  }
-  .mini-chip.active {
-    border-color: var(--accent);
-    background: var(--accent-dim);
-    color: var(--accent);
-  }
+/* Edit area */
+.edit-area { border-top: 1px solid var(--border); padding: 14px; background: rgba(0,0,0,.25); }
+.edit-field { margin-bottom: 10px; }
 
-  /* ── Buttons ── */
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 7px 14px;
-    border-radius: var(--radius);
-    font-family: var(--sans);
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    border: 1px solid transparent;
-    transition: all 0.15s;
-  }
-  .btn-ghost {
-    background: transparent;
-    border-color: var(--border);
-    color: var(--muted);
-  }
-  .btn-ghost:hover { border-color: var(--border-hover); color: var(--text); }
-  .btn-accent {
-    background: var(--accent);
-    color: #fff;
-    border-color: var(--accent);
-  }
-  .btn-accent:hover { opacity: 0.85; }
-  .btn-danger {
-    background: transparent;
-    border-color: transparent;
-    color: var(--red);
-    padding: 4px 8px;
-  }
-  .btn-danger:hover { background: var(--red-dim); }
-  .btn-sm { padding: 4px 10px; font-size: 11px; }
-  .btn-green {
-    background: var(--green);
-    color: #0d0d0f;
-    border-color: var(--green);
-    font-weight: 600;
-  }
-  .btn-green:hover { opacity: 0.85; }
+/* Subtool rows */
+.subtool-block { background: rgba(0,0,0,.3); border: 1px solid var(--border); border-radius: var(--r); margin-top: 4px; }
+.subtool-item { padding: 10px 12px; border-bottom: 1px solid var(--border); }
+.subtool-item:last-child { border-bottom: none; }
+.subtool-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+.subtool-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.subtool-name { font-size: 12px; font-weight: 500; color: var(--muted2); }
 
-  /* ── Output Panel ── */
-  .output-area {
-    position: relative;
-    height: calc(100vh - 65px);
-    display: flex;
-    flex-direction: column;
-  }
-  .output-toolbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 14px 20px;
-    border-bottom: 1px solid var(--border);
-    background: var(--surface);
-    flex-shrink: 0;
-  }
-  .output-code {
-    flex: 1;
-    overflow: auto;
-    padding: 20px;
-  }
-  pre {
-    font-family: var(--mono);
-    font-size: 12px;
-    line-height: 1.7;
-    white-space: pre;
-    color: #c9d1d9;
-  }
+/* Code output */
+pre { font-family: var(--mono); font-size: 12px; line-height: 1.75; white-space: pre; color: #abb2bf; }
+.kw { color: #c678dd; } .str { color: #98c379; } .cm { color: #5c6370; font-style: italic; }
+.typ { color: #e5c07b; } .fn { color: #61afef; } .num { color: #d19a66; }
 
-  /* ── Syntax Highlight Colors ── */
-  .kw   { color: #ff79c6; }
-  .str  { color: #f1fa8c; }
-  .fn   { color: #8be9fd; }
-  .cm   { color: #6272a4; }
-  .num  { color: #bd93f9; }
-  .prop { color: #50fa7b; }
-  .typ  { color: #ffb86c; }
+/* Empty */
+.empty { text-align: center; padding: 32px; color: var(--muted); font-size: 13px; border: 1px dashed var(--border); border-radius: var(--r); }
 
-  /* ── Copy toast ── */
-  .toast {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    background: var(--green);
-    color: #0d0d0f;
-    font-size: 13px;
-    font-weight: 600;
-    padding: 10px 18px;
-    border-radius: var(--radius);
-    opacity: 0;
-    transform: translateY(8px);
-    transition: all 0.2s;
-    pointer-events: none;
-    z-index: 999;
-  }
-  .toast.show { opacity: 1; transform: translateY(0); }
+/* Toast */
+.toast { position: fixed; bottom: 20px; right: 20px; background: var(--green); color: #0a0a0a; font-size: 12px; font-weight: 600; padding: 9px 16px; border-radius: var(--r); opacity: 0; transform: translateY(6px); transition: all .2s; pointer-events: none; z-index: 999; }
+.toast.show { opacity: 1; transform: translateY(0); }
 
-  /* ── Add tool form ── */
-  .add-form {
-    border: 1px dashed var(--border);
-    border-radius: var(--radius);
-    padding: 16px;
-    margin-bottom: 12px;
-    background: rgba(108,142,255,0.03);
-  }
-  .form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 10px;
-  }
-  .form-row.single { grid-template-columns: 1fr; }
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
 
-  /* ── Empty state ── */
-  .empty {
-    text-align: center;
-    padding: 40px;
-    color: var(--muted);
-    font-size: 13px;
-    border: 1px dashed var(--border);
-    border-radius: var(--radius);
-  }
-
-  /* ── Scrollbar ── */
-  ::-webkit-scrollbar { width: 4px; height: 4px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-
-  .divider { height: 1px; background: var(--border); margin: 20px 0; }
-  .row { display: flex; gap: 8px; align-items: center; }
-  .flex1 { flex: 1; }
+.ptitle { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
 </style>
 </head>
 <body>
 
 <header>
   <div class="logo">
-    <div class="logo-dot"></div>
+    <div class="dot"></div>
     ENIC MIS
-    <span class="badge">tools.ts generator</span>
+    <span class="pill">tools.ts generator</span>
   </div>
-  <div class="row">
-    <span style="font-size:12px;color:var(--muted);">Edit tools on the left — output updates live</span>
-  </div>
+  <span class="header-hint">Edit on the left · output updates live on the right</span>
 </header>
 
-<div class="container">
+<div class="layout">
 
-  <!-- ── LEFT: Editor ── -->
-  <div class="panel" id="editorPanel">
+  <!-- LEFT: Editor -->
+  <div class="left">
+    <div class="left-toolbar">
+      <span class="ptitle">Tools</span>
+      <button class="btn btn-accent btn-sm" onclick="toggleAdd()">+ Add Tool</button>
+    </div>
+    <div class="left-body">
 
-    <!-- Add Tool Form -->
-    <div class="section">
-      <div class="panel-header">
-        <span class="panel-title">Tools</span>
-        <button class="btn btn-accent btn-sm" onclick="toggleAddForm()">+ Add Tool</button>
-      </div>
-
-      <div class="add-form" id="addForm" style="display:none">
-        <div class="form-row">
-          <div>
-            <div class="section-label">Title</div>
-            <input type="text" id="newTitle" placeholder="e.g. Reports" />
+      <!-- Add form -->
+      <div id="addForm" style="display:none" class="add-form">
+        <div class="field-row">
+          <div class="field">
+            <div class="slabel">Title</div>
+            <input type="text" id="nTitle" placeholder="e.g. Reports" />
           </div>
-          <div>
-            <div class="section-label">URL <span style="color:var(--muted);font-size:10px">(leave blank if has subtools)</span></div>
-            <input type="text" id="newUrl" placeholder="/reports" />
+          <div class="field">
+            <div class="slabel">URL <span style="color:var(--muted);font-size:9px">(blank = has subtools)</span></div>
+            <input type="text" id="nUrl" placeholder="/reports" />
           </div>
         </div>
-        <div class="form-row single">
-          <div>
-            <div class="section-label">Description</div>
-            <input type="text" id="newDesc" placeholder="Short description of this tool" />
-          </div>
+        <div class="field">
+          <div class="slabel">Description</div>
+          <input type="text" id="nDesc" placeholder="Short description" />
         </div>
-        <div class="form-row">
-          <div>
-            <div class="section-label">Icon (lucide name)</div>
-            <input type="text" id="newIcon" placeholder="e.g. BarChart2" />
+        <div class="field-row">
+          <div class="field">
+            <div class="slabel">Icon (lucide name)</div>
+            <input type="text" id="nIcon" placeholder="e.g. BarChart2" />
           </div>
-          <div>
-            <div class="section-label">Type</div>
-            <select id="newType">
+          <div class="field">
+            <div class="slabel">Type</div>
+            <select id="nType">
               <option value="leaf">Leaf (single page)</option>
               <option value="parent">Parent (has subtools)</option>
             </select>
           </div>
         </div>
-        <div style="margin-bottom:12px">
-          <div class="section-label">Allowed Roles</div>
-          <div class="roles-grid" id="newRolesGrid"></div>
+        <div class="field">
+          <div class="slabel">Allowed Roles</div>
+          <div class="chips" id="nRolesChips"></div>
         </div>
-        <div class="row">
-          <button class="btn btn-ghost btn-sm" onclick="toggleAddForm()">Cancel</button>
-          <button class="btn btn-accent btn-sm" onclick="addTool()">Add Tool</button>
+        <div class="row" style="margin-top:12px">
+          <button class="btn btn-ghost btn-sm" onclick="toggleAdd()">Cancel</button>
+          <button class="btn btn-accent btn-sm" onclick="commitAdd()">Add</button>
         </div>
       </div>
 
-      <!-- Tools List -->
-      <div class="tools-list" id="toolsList">
-        <div class="empty">No tools yet. Click "Add Tool" to get started.</div>
-      </div>
+      <!-- Tool list -->
+      <div id="toolList"></div>
     </div>
-
   </div>
 
-  <!-- ── RIGHT: Output ── -->
-  <div class="output-area">
-    <div class="output-toolbar">
-      <span class="panel-title">Generated tools.ts</span>
+  <!-- RIGHT: Output -->
+  <div class="right">
+    <div class="right-toolbar">
+      <span class="ptitle">Generated tools.ts</span>
       <div class="row">
-        <button class="btn btn-ghost btn-sm" onclick="copyOutput()">Copy</button>
-        <button class="btn btn-green btn-sm" onclick="downloadOutput()">↓ Download</button>
+        <button class="btn btn-ghost btn-sm" onclick="doCopy()">Copy</button>
+        <button class="btn btn-green btn-sm" onclick="doDownload()">↓ Download</button>
       </div>
     </div>
-    <div class="output-code">
-      <pre id="outputCode"></pre>
+    <div class="right-body">
+      <pre id="out"></pre>
     </div>
   </div>
 
 </div>
-
-<div class="toast" id="toast">✓ Copied to clipboard</div>
+<div class="toast" id="toast">✓ Copied!</div>
 
 <script>
-// ── State ──────────────────────────────────────────────────────────────────
 const ROLES = ['superadmin','admin','guest','dev','operations','marketing','managers','documentations','it','others'];
 
-const ICONS = [
-  'Home','LayoutDashboard','User2','CirclePile','HardHat','BadgeDollarSign',
-  'HandshakeIcon','BotIcon','BarChart2','FileText','Settings','Shield',
-  'Package','Truck','Calendar','Bell','Globe','Database','Code','Layers'
-];
-
 let tools = [
-  {
-    title: 'Home', url: '/home', icon: 'Home',
-    description: 'Welcome dashboard and main landing page',
-    allowedRoles: [], subtools: []
-  },
-  {
-    title: 'Dashboard', url: '/dashboard', icon: 'LayoutDashboard',
-    description: 'View system stats and analytics',
-    allowedRoles: ['superadmin','admin'], subtools: []
-  },
-  {
-    title: 'User Management', url: '/users', icon: 'User2Icon',
-    description: 'Manage users, roles, and permissions',
-    allowedRoles: ['superadmin','admin'], subtools: []
-  },
-  {
-    title: 'Inventory & Assets', url: '', icon: 'CirclePile',
-    description: 'Track and manage inventory and assets',
-    allowedRoles: ['superadmin','admin','operations'],
-    subtools: [
-      { title:'Asset List', url:'/inventory/assets', description:'View and edit all assets', allowedRoles:['superadmin','admin','operations'] },
-      { title:'Asset Reports', url:'/inventory/reports', description:'Generate inventory and asset reports', allowedRoles:['superadmin'] }
-    ]
-  },
-  {
-    title: 'Operations', url: '', icon: 'HardHat',
-    description: 'Manage daily operations workflow',
-    allowedRoles: ['superadmin','operations'],
-    subtools: [
-      { title:'Task Board', url:'/operations/tasks', description:'View and manage tasks', allowedRoles:['superadmin','operations'] },
-      { title:'Shift Schedules', url:'/operations/shifts', description:'Manage employee shifts', allowedRoles:['superadmin'] }
-    ]
-  },
-  {
-    title: 'Finance', url: '', icon: 'BadgeDollarSign',
-    description: 'Financial management tools and reports',
-    allowedRoles: ['superadmin','managers'],
-    subtools: [
-      { title:'Expense Tracker', url:'/finance/expenses', description:'Track company expenses', allowedRoles:['superadmin','managers'] },
-      { title:'Budget Planner', url:'/finance/budget', description:'Plan and monitor budgets', allowedRoles:['superadmin','managers'] }
-    ]
-  },
-  {
-    title: 'Marketing', url: '', icon: 'HandshakeIcon',
-    description: 'CRM and marketing tools',
-    allowedRoles: ['superadmin','marketing'],
-    subtools: [
-      { title:'Campaigns', url:'/marketing/campaigns', description:'Manage marketing campaigns', allowedRoles:['superadmin','marketing'] },
-      { title:'Leads', url:'/marketing/leads', description:'View and manage leads', allowedRoles:['superadmin','marketing'] }
-    ]
-  },
-  {
-    title: 'AI Assistant', url: '/ai-assistant', icon: 'BotIcon',
-    description: 'AI-powered workflow assistant',
-    allowedRoles: ['superadmin','admin'], subtools: []
-  }
+  { title:'Home', url:'/home', icon:'Home', description:'Welcome dashboard and main landing page', allowedRoles:[], subtools:[] },
+  { title:'Dashboard', url:'/dashboard', icon:'LayoutDashboard', description:'View system stats and analytics', allowedRoles:['superadmin','admin'], subtools:[] },
+  { title:'User Management', url:'/users', icon:'User2Icon', description:'Manage users, roles, and permissions', allowedRoles:['superadmin','admin'], subtools:[] },
+  { title:'Inventory & Assets', url:'', icon:'CirclePile', description:'Track and manage inventory and assets', allowedRoles:['superadmin','admin','operations'], subtools:[
+    { title:'Asset List', url:'/inventory/assets', description:'View and edit all assets', allowedRoles:['superadmin','admin','operations'] },
+    { title:'Asset Reports', url:'/inventory/reports', description:'Generate inventory and asset reports', allowedRoles:['superadmin'] },
+  ]},
+  { title:'Operations', url:'', icon:'HardHat', description:'Manage daily operations workflow', allowedRoles:['superadmin','operations'], subtools:[
+    { title:'Task Board', url:'/operations/tasks', description:'View and manage tasks', allowedRoles:['superadmin','operations'] },
+    { title:'Shift Schedules', url:'/operations/shifts', description:'Manage employee shifts', allowedRoles:['superadmin'] },
+  ]},
+  { title:'Finance', url:'', icon:'BadgeDollarSign', description:'Financial management tools and reports', allowedRoles:['superadmin','managers'], subtools:[
+    { title:'Expense Tracker', url:'/finance/expenses', description:'Track company expenses', allowedRoles:['superadmin','managers'] },
+    { title:'Budget Planner', url:'/finance/budget', description:'Plan and monitor budgets', allowedRoles:['superadmin','managers'] },
+  ]},
+  { title:'Marketing', url:'', icon:'HandshakeIcon', description:'CRM and marketing tools', allowedRoles:['superadmin','marketing'], subtools:[
+    { title:'Campaigns', url:'/marketing/campaigns', description:'Manage marketing campaigns', allowedRoles:['superadmin','marketing'] },
+    { title:'Leads', url:'/marketing/leads', description:'View and manage leads', allowedRoles:['superadmin','marketing'] },
+  ]},
+  { title:'AI Assistant', url:'/ai-assistant', icon:'BotIcon', description:'AI-powered workflow assistant', allowedRoles:['superadmin','admin'], subtools:[] },
 ];
 
-// ── Render Editor ──────────────────────────────────────────────────────────
-function renderEditor() {
-  const list = document.getElementById('toolsList');
-  if (tools.length === 0) {
-    list.innerHTML = '<div class="empty">No tools yet. Click "Add Tool" to get started.</div>';
-    return;
-  }
-  list.innerHTML = tools.map((tool, i) => `
+// ── Render editor ──────────────────────────────────────────────────────────
+function render() {
+  const list = document.getElementById('toolList');
+  if (!tools.length) { list.innerHTML = '<div class="empty">No tools. Click + Add Tool.</div>'; renderOut(); return; }
+
+  list.innerHTML = tools.map((t, i) => `
     <div class="tool-card">
-      <div class="tool-card-header">
-        <div class="tool-card-left">
-          <span class="tool-index">${String(i+1).padStart(2,'0')}</span>
-          <span class="tool-name">${escHtml(tool.title)}</span>
-          <span class="tool-url">${tool.url ? escHtml(tool.url) : ''}</span>
+      <div class="card-header" onclick="toggleEdit(${i})">
+        <div class="card-left">
+          <span class="card-num">${String(i+1).padStart(2,'0')}</span>
+          <span class="card-title">${esc(t.title)}</span>
+          <span class="card-url">${t.url ? esc(t.url) : ''}</span>
         </div>
-        <div class="tool-card-actions">
-          ${tool.subtools.length > 0 ? `<span class="subtool-count">${tool.subtools.length} subtools</span>` : ''}
-          <button class="btn btn-ghost btn-sm" onclick="toggleEdit(${i})" style="font-size:11px">Edit</button>
-          <button class="btn btn-danger btn-sm" onclick="removeTool(${i})">✕</button>
+        <div class="card-right">
+          ${t.subtools.length ? `<span class="sub-badge">${t.subtools.length} sub</span>` : ''}
+          <button class="btn btn-red btn-sm" onclick="event.stopPropagation();removeTool(${i})">✕</button>
         </div>
       </div>
-      <div id="editArea-${i}" style="display:none; border-top:1px solid var(--border); padding:14px; background:rgba(0,0,0,0.15);">
-        <div class="form-row">
-          <div>
-            <div class="section-label">Title</div>
-            <input type="text" value="${escHtml(tool.title)}" oninput="tools[${i}].title=this.value;renderOutput()" />
-          </div>
-          <div>
-            <div class="section-label">URL</div>
-            <input type="text" value="${escHtml(tool.url)}" oninput="tools[${i}].url=this.value;renderOutput()" placeholder="/path or empty if parent" />
-          </div>
-        </div>
-        <div class="form-row single" style="margin-bottom:10px">
-          <div>
-            <div class="section-label">Description</div>
-            <input type="text" value="${escHtml(tool.description)}" oninput="tools[${i}].description=this.value;renderOutput()" />
-          </div>
-        </div>
-        <div class="form-row single" style="margin-bottom:10px">
-          <div>
-            <div class="section-label">Icon</div>
-            <input type="text" value="${escHtml(tool.icon||'')}" oninput="tools[${i}].icon=this.value;renderOutput()" placeholder="Lucide icon name" />
-          </div>
-        </div>
-        <div style="margin-bottom:12px">
-          <div class="section-label">Allowed Roles</div>
-          <div class="roles-grid">
-            ${ROLES.map(r => `
-              <label class="role-chip ${tool.allowedRoles.includes(r)?'active':''}">
-                <input type="checkbox" ${tool.allowedRoles.includes(r)?'checked':''} onchange="toggleRole(${i},-1,'${r}',this.checked)" />
-                ${r}
-              </label>
-            `).join('')}
-          </div>
-        </div>
+      <div id="ea-${i}" style="display:none">
+        <div class="edit-area">
 
-        ${tool.subtools.length > 0 || tool.url === '' ? `
-        <div>
-          <div class="section-label" style="margin-bottom:8px">Subtools
-            <button class="btn btn-ghost btn-sm" style="margin-left:8px" onclick="addSubtool(${i})">+ Add</button>
+          <div class="field-row" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+            <div>
+              <div class="slabel">Title</div>
+              <input type="text" value="${esc(t.title)}" oninput="tools[${i}].title=this.value;renderOut()" />
+            </div>
+            <div>
+              <div class="slabel">URL</div>
+              <input type="text" value="${esc(t.url)}" oninput="tools[${i}].url=this.value;renderOut()" placeholder="/path or blank if parent" />
+            </div>
           </div>
-          ${tool.subtools.map((sub, j) => `
-            <div class="subtool-row">
-              <input type="text" value="${escHtml(sub.title)}" oninput="tools[${i}].subtools[${j}].title=this.value;renderOutput()" placeholder="Title" style="flex:1" />
-              <input type="text" value="${escHtml(sub.url)}" oninput="tools[${i}].subtools[${j}].url=this.value;renderOutput()" placeholder="/module/path" style="flex:1" />
-              <input type="text" value="${escHtml(sub.description||'')}" oninput="tools[${i}].subtools[${j}].description=this.value;renderOutput()" placeholder="Description" style="flex:1.5" />
-              <div class="subtool-role-mini">
-                ${ROLES.map(r => `
-                  <span class="mini-chip ${sub.allowedRoles.includes(r)?'active':''}" onclick="toggleRole(${i},${j},'${r}',!tools[${i}].subtools[${j}].allowedRoles.includes('${r}'));renderEditor();renderOutput()">${r}</span>
+
+          <div style="margin-bottom:10px">
+            <div class="slabel">Description</div>
+            <input type="text" value="${esc(t.description||'')}" oninput="tools[${i}].description=this.value;renderOut()" placeholder="Short description" />
+          </div>
+
+          <div style="margin-bottom:10px">
+            <div class="slabel">Icon (lucide name)</div>
+            <input type="text" value="${esc(t.icon||'')}" oninput="tools[${i}].icon=this.value;renderOut()" placeholder="e.g. BarChart2" />
+          </div>
+
+          <div style="margin-bottom:14px">
+            <div class="slabel">Allowed Roles</div>
+            <div class="chips">
+              ${ROLES.map(r => `<span class="chip ${t.allowedRoles.includes(r)?'on':''}" onclick="togRole(${i},-1,'${r}')">${r}</span>`).join('')}
+            </div>
+          </div>
+
+          <!-- Subtools -->
+          <div>
+            <div class="row" style="margin-bottom:8px">
+              <span class="slabel" style="margin-bottom:0">Subtools</span>
+              <button class="btn btn-ghost btn-sm" onclick="addSub(${i})">+ Add Subtool</button>
+            </div>
+            ${t.subtools.length ? `
+              <div class="subtool-block">
+                ${t.subtools.map((s, j) => `
+                  <div class="subtool-item">
+                    <div class="subtool-header">
+                      <span class="subtool-name">${esc(s.title) || 'Untitled'}</span>
+                      <button class="btn btn-red btn-sm" onclick="removeSub(${i},${j})">✕</button>
+                    </div>
+                    <div class="subtool-fields">
+                      <div>
+                        <div class="slabel">Title</div>
+                        <input type="text" value="${esc(s.title)}" oninput="tools[${i}].subtools[${j}].title=this.value;render()" placeholder="Subtool title" />
+                      </div>
+                      <div>
+                        <div class="slabel">URL</div>
+                        <input type="text" value="${esc(s.url)}" oninput="tools[${i}].subtools[${j}].url=this.value;renderOut()" placeholder="/module/path" />
+                      </div>
+                    </div>
+                    <div style="margin-bottom:8px">
+                      <div class="slabel">Description</div>
+                      <input type="text" value="${esc(s.description||'')}" oninput="tools[${i}].subtools[${j}].description=this.value;renderOut()" placeholder="Description" />
+                    </div>
+                    <div>
+                      <div class="slabel">Allowed Roles</div>
+                      <div class="chips">
+                        ${ROLES.map(r => `<span class="chip ${s.allowedRoles.includes(r)?'on':''}" onclick="togRole(${i},${j},'${r}')">${r}</span>`).join('')}
+                      </div>
+                    </div>
+                  </div>
                 `).join('')}
               </div>
-              <button class="btn btn-danger btn-sm" onclick="removeSubtool(${i},${j})">✕</button>
-            </div>
-          `).join('')}
+            ` : `<div style="color:var(--muted);font-size:12px;padding:6px 0">No subtools yet.</div>`}
+          </div>
+
         </div>
-        ` : ''}
       </div>
     </div>
   `).join('');
-  renderOutput();
+  renderOut();
 }
 
-// ── Toggle edit area ───────────────────────────────────────────────────────
 function toggleEdit(i) {
-  const el = document.getElementById(`editArea-${i}`);
+  const el = document.getElementById(`ea-${i}`);
   el.style.display = el.style.display === 'none' ? 'block' : 'none';
 }
 
-// ── Role toggle ────────────────────────────────────────────────────────────
-function toggleRole(toolIdx, subIdx, role, checked) {
-  const arr = subIdx === -1
-    ? tools[toolIdx].allowedRoles
-    : tools[toolIdx].subtools[subIdx].allowedRoles;
-  if (checked && !arr.includes(role)) arr.push(role);
-  if (!checked) { const idx = arr.indexOf(role); if (idx > -1) arr.splice(idx,1); }
-  renderEditor();
-  renderOutput();
+function togRole(ti, si, role) {
+  const arr = si === -1 ? tools[ti].allowedRoles : tools[ti].subtools[si].allowedRoles;
+  const idx = arr.indexOf(role);
+  if (idx > -1) arr.splice(idx, 1); else arr.push(role);
+  render();
 }
 
-// ── Add / Remove ───────────────────────────────────────────────────────────
-function toggleAddForm() {
+function removeTool(i) { tools.splice(i,1); render(); }
+function addSub(i) { tools[i].subtools.push({title:'New Subtool',url:'',description:'',allowedRoles:[]}); render(); }
+function removeSub(ti,si) { tools[ti].subtools.splice(si,1); render(); }
+
+// ── Add form ───────────────────────────────────────────────────────────────
+let nRoles = [];
+function toggleAdd() {
   const f = document.getElementById('addForm');
-  f.style.display = f.style.display === 'none' ? 'block' : 'none';
-  if (f.style.display === 'block') renderNewRolesGrid();
+  const open = f.style.display === 'none';
+  f.style.display = open ? 'block' : 'none';
+  if (open) {
+    nRoles = [];
+    document.getElementById('nRolesChips').innerHTML = ROLES.map(r =>
+      `<span class="chip" id="nr-${r}" onclick="togNRole('${r}')">${r}</span>`
+    ).join('');
+  }
+}
+function togNRole(r) {
+  const i = nRoles.indexOf(r); if (i>-1) nRoles.splice(i,1); else nRoles.push(r);
+  document.getElementById(`nr-${r}`).classList.toggle('on', nRoles.includes(r));
+}
+function commitAdd() {
+  const title = document.getElementById('nTitle').value.trim();
+  if (!title) { alert('Title is required'); return; }
+  tools.push({
+    title, url: document.getElementById('nUrl').value.trim(),
+    icon: document.getElementById('nIcon').value.trim(),
+    description: document.getElementById('nDesc').value.trim(),
+    allowedRoles: [...nRoles], subtools: []
+  });
+  ['nTitle','nUrl','nIcon','nDesc'].forEach(id => document.getElementById(id).value = '');
+  toggleAdd(); render();
 }
 
-let newSelectedRoles = [];
-function renderNewRolesGrid() {
-  newSelectedRoles = [];
-  document.getElementById('newRolesGrid').innerHTML = ROLES.map(r => `
-    <label class="role-chip" id="newRole-${r}">
-      <input type="checkbox" onchange="toggleNewRole('${r}',this.checked)" />
-      ${r}
-    </label>
-  `).join('');
-}
-
-function toggleNewRole(role, checked) {
-  if (checked) newSelectedRoles.push(role);
-  else newSelectedRoles = newSelectedRoles.filter(r => r !== role);
-  document.getElementById(`newRole-${role}`).classList.toggle('active', checked);
-}
-
-function addTool() {
-  const title = document.getElementById('newTitle').value.trim();
-  if (!title) return alert('Title is required');
-  const url = document.getElementById('newUrl').value.trim();
-  const desc = document.getElementById('newDesc').value.trim();
-  const icon = document.getElementById('newIcon').value.trim();
-  tools.push({ title, url, icon, description: desc, allowedRoles: [...newSelectedRoles], subtools: [] });
-  document.getElementById('newTitle').value = '';
-  document.getElementById('newUrl').value = '';
-  document.getElementById('newDesc').value = '';
-  document.getElementById('newIcon').value = '';
-  toggleAddForm();
-  renderEditor();
-}
-
-function removeTool(i) {
-  tools.splice(i, 1);
-  renderEditor();
-}
-
-function addSubtool(i) {
-  tools[i].subtools.push({ title:'New Subtool', url:'', description:'', allowedRoles:[] });
-  renderEditor();
-}
-
-function removeSubtool(toolIdx, subIdx) {
-  tools[toolIdx].subtools.splice(subIdx, 1);
-  renderEditor();
-}
-
-// ── Generate Output ────────────────────────────────────────────────────────
-function renderOutput() {
-  const code = generateTS();
-  document.getElementById('outputCode').innerHTML = highlight(code);
-}
-
+// ── Generate TS ────────────────────────────────────────────────────────────
 function generateTS() {
-  // Collect all icons used
   const icons = [...new Set(tools.filter(t=>t.icon).map(t=>t.icon))];
 
-  // Collect which tools need lazy imports (have component fields — placeholder)
-  const lazyLines = tools.filter(t => t.url && !['Home'].includes(t.title))
-    .map(t => `// const ${toPascal(t.title)} = lazy(() => import("@/pages/${toPascal(t.title)}Page"));`)
-    .join('\n');
+  // Build lazy import comments
+  const lazyParts = [];
+  tools.forEach(t => {
+    if (!t.url || t.title === 'Home') return;
+    lazyParts.push(`// const ${pascal(t.title)} = lazy(() => import("@/pages/${pascal(t.title)}Page"));`);
+  });
+  tools.forEach(t => {
+    (t.subtools||[]).forEach(s => {
+      const seg = s.url.split('/').filter(Boolean);
+      const dir = seg.length > 1 ? seg.slice(0,-1).join('/') : '';
+      const path = dir ? `@/pages/tools/${dir}/${pascal(s.title)}Page` : `@/pages/tools/${pascal(s.title)}Page`;
+      lazyParts.push(`// const ${pascal(s.title)} = lazy(() => import("${path}"));`);
+    });
+  });
 
-  const toolsStr = tools.map(tool => {
-    const hasSubtools = tool.subtools && tool.subtools.length > 0;
-    const lines = [];
-    lines.push('  {');
-    lines.push(`    title: "${tool.title}",`);
-    if (tool.url) lines.push(`    url: "${tool.url}",`);
-    if (tool.icon) lines.push(`    icon: ${tool.icon},`);
-    if (tool.description) lines.push(`    description: "${tool.description}",`);
-    if (tool.allowedRoles && tool.allowedRoles.length > 0)
-      lines.push(`    allowedRoles: [${tool.allowedRoles.map(r=>`"${r}"`).join(', ')}],`);
-    if (tool.url && tool.title !== 'Home')
-      lines.push(`    // component: ${toPascal(tool.title)},`);
-    if (hasSubtools) {
+  // Build toolsData string
+  const toolsStr = tools.map(t => {
+    const lines = ['  {'];
+    lines.push(`    title: "${t.title}",`);
+    if (t.url) lines.push(`    url: "${t.url}",`);
+    if (t.icon) lines.push(`    icon: ${t.icon},`);
+    if (t.description) lines.push(`    description: "${t.description}",`);
+    if (t.allowedRoles?.length) lines.push(`    allowedRoles: [${t.allowedRoles.map(r=>`"${r}"`).join(', ')}],`);
+    if (t.url && t.title !== 'Home') lines.push(`    // component: ${pascal(t.title)},`);
+    if (t.subtools?.length) {
       lines.push('    subtools: [');
-      tool.subtools.forEach(sub => {
+      t.subtools.forEach(s => {
         lines.push('      {');
-        lines.push(`        title: "${sub.title}",`);
-        lines.push(`        url: "${sub.url}",`);
-        if (sub.description) lines.push(`        description: "${sub.description}",`);
-        if (sub.allowedRoles && sub.allowedRoles.length > 0)
-          lines.push(`        allowedRoles: [${sub.allowedRoles.map(r=>`"${r}"`).join(', ')}],`);
-        lines.push(`        // component: ${toPascal(sub.title)},`);
+        lines.push(`        title: "${s.title}",`);
+        lines.push(`        url: "${s.url}",`);
+        if (s.description) lines.push(`        description: "${s.description}",`);
+        if (s.allowedRoles?.length) lines.push(`        allowedRoles: [${s.allowedRoles.map(r=>`"${r}"`).join(', ')}],`);
+        lines.push(`        // component: ${pascal(s.title)},`);
         lines.push('      },');
       });
       lines.push('    ],');
@@ -757,9 +432,27 @@ function generateTS() {
     return lines.join('\n');
   }).join('\n');
 
+  // Build component checklist
+  const checklistItems = [];
+  tools.forEach(t => {
+    if (!t.url || t.title === 'Home') return;
+    const seg = t.url.split('/').filter(Boolean);
+    const path = seg.length > 1
+      ? `src/pages/tools/${seg.slice(0,-1).join('/')}/${pascal(t.title)}Page.tsx`
+      : `src/pages/${pascal(t.title)}Page.tsx`;
+    checklistItems.push(`//   [ ] ${pascal(t.title)}Page  →  ${path}`);
+  });
+  tools.forEach(t => {
+    (t.subtools||[]).forEach(s => {
+      const seg = s.url.split('/').filter(Boolean);
+      const dir = seg.length > 1 ? seg.slice(0,-1).join('/') : 'tools';
+      checklistItems.push(`//   [ ] ${pascal(s.title)}Page  →  src/pages/tools/${dir}/${pascal(s.title)}Page.tsx`);
+    });
+  });
+
   return `import type { ElementType, ComponentType } from "react";
 import {
-${icons.map(ic=>`  ${ic},`).join('\n')}
+${icons.map(ic => `  ${ic},`).join('\n')}
 } from "lucide-react";
 import { lazy } from "react";
 import type { UserRole } from "./schema";
@@ -783,9 +476,9 @@ export interface Tool {
 }
 
 // ---------------------------------------------------------------------------
-// Lazy imports — uncomment when component is ready
+// Lazy imports — uncomment when component is ready, then set component: X
 // ---------------------------------------------------------------------------
-${lazyLines}
+${lazyParts.join('\n')}
 
 export const toolsData: Tool[] = [
 ${toolsStr}
@@ -802,46 +495,49 @@ export function hasAccess(
   if (!allowedRoles || allowedRoles.length === 0) return true;
   return allowedRoles.includes(userRole.toLowerCase() as UserRole);
 }
+
+// ---------------------------------------------------------------------------
+// Components to create — check off as you build each page
+// ---------------------------------------------------------------------------
+${checklistItems.join('\n')}
 `;
 }
 
-// ── Helpers ────────────────────────────────────────────────────────────────
-function toPascal(str) {
-  return str.replace(/[^a-zA-Z0-9]+(.)/g, (_, c) => c.toUpperCase())
-            .replace(/^./, c => c.toUpperCase());
+// ── Render output ──────────────────────────────────────────────────────────
+function renderOut() {
+  document.getElementById('out').innerHTML = hl(generateTS());
 }
 
-function escHtml(str) {
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function hl(code) {
+  return esc(code)
+    .replace(/\/\/.*$/gm, m => `<span class="cm">${m}</span>`)
+    .replace(/\b(import|export|from|const|let|type|interface|function|return|if|true|false|undefined)\b/g, m => `<span class="kw">${m}</span>`)
+    .replace(/&quot;([^&]*)&quot;/g, m => `<span class="str">${m}</span>`);
 }
 
-function highlight(code) {
-  return escHtml(code)
-    .replace(/\/\/ .*$/gm, m => `<span class="cm">${m}</span>`)
-    .replace(/\b(import|export|from|const|let|type|interface|function|return|if|true|false)\b/g, m => `<span class="kw">${m}</span>`)
-    .replace(/"([^"]*)"/g, m => `<span class="str">${m}</span>`)
-    .replace(/\b([A-Z][a-zA-Z]+)(?=[:,\s])/g, m => `<span class="typ">${m}</span>`);
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-function copyOutput() {
-  const code = generateTS();
-  navigator.clipboard.writeText(code).then(() => {
+function pascal(s) {
+  return s.replace(/[^a-zA-Z0-9]+(.)/g, (_,c) => c.toUpperCase()).replace(/^./,c=>c.toUpperCase());
+}
+
+function doCopy() {
+  navigator.clipboard.writeText(generateTS()).then(() => {
     const t = document.getElementById('toast');
     t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 2000);
   });
 }
 
-function downloadOutput() {
-  const blob = new Blob([generateTS()], { type: 'text/typescript' });
+function doDownload() {
   const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'tools.ts';
-  a.click();
+  a.href = URL.createObjectURL(new Blob([generateTS()], {type:'text/typescript'}));
+  a.download = 'tools.ts'; a.click();
 }
 
-// ── Init ──────────────────────────────────────────────────────────────────
-renderEditor();
+render();
 </script>
 </body>
 </html>
