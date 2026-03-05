@@ -1,278 +1,862 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>ENIC · tools.ts Generator</title>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
-<style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-:root {
-  --bg: #0d0d0f; --surface: #141416; --surface2: #18181c;
-  --border: #222228; --border2: #2e2e38;
-  --text: #e8e8ec; --muted: #52525e; --muted2: #7a7a8a;
-  --accent: #6c8eff; --accent-dim: #151d38;
-  --green: #4ade80; --red: #f87171; --red-dim: #250d0d;
-  --mono: 'JetBrains Mono', monospace;
-  --sans: 'DM Sans', sans-serif;
-  --r: 6px;
-}
-body { font-family: var(--sans); background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ENIC · tools.ts Generator</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=DM+Sans:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      :root {
+        --bg: #0d0d0f;
+        --surface: #141416;
+        --surface2: #18181c;
+        --border: #222228;
+        --border2: #2e2e38;
+        --text: #e8e8ec;
+        --muted: #52525e;
+        --muted2: #7a7a8a;
+        --accent: #6c8eff;
+        --accent-dim: #151d38;
+        --green: #4ade80;
+        --red: #f87171;
+        --red-dim: #250d0d;
+        --mono: "JetBrains Mono", monospace;
+        --sans: "DM Sans", sans-serif;
+        --r: 6px;
+      }
+      body {
+        font-family: var(--sans);
+        background: var(--bg);
+        color: var(--text);
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
 
-header {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 0 24px; height: 52px; flex-shrink: 0;
-  background: var(--surface); border-bottom: 1px solid var(--border);
-}
-.logo { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; }
-.dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 6px var(--accent); animation: blink 2s ease-in-out infinite; }
-@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
-.pill { font-family: var(--mono); font-size: 10px; padding: 2px 7px; border-radius: 20px; background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(108,142,255,.25); }
-.header-hint { font-size: 11px; color: var(--muted); }
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 24px;
+        height: 52px;
+        flex-shrink: 0;
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+      }
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        font-weight: 600;
+      }
+      .dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--accent);
+        box-shadow: 0 0 6px var(--accent);
+        animation: blink 2s ease-in-out infinite;
+      }
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.3;
+        }
+      }
+      .pill {
+        font-family: var(--mono);
+        font-size: 10px;
+        padding: 2px 7px;
+        border-radius: 20px;
+        background: var(--accent-dim);
+        color: var(--accent);
+        border: 1px solid rgba(108, 142, 255, 0.25);
+      }
+      .header-hint {
+        font-size: 11px;
+        color: var(--muted);
+      }
 
-.layout { display: grid; grid-template-columns: 500px 1fr; flex: 1; overflow: hidden; }
+      .layout {
+        display: grid;
+        grid-template-columns: 500px 1fr;
+        flex: 1;
+        overflow: hidden;
+      }
 
-.left { display: flex; flex-direction: column; border-right: 1px solid var(--border); overflow: hidden; }
-.left-toolbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-bottom: 1px solid var(--border); flex-shrink: 0; background: var(--surface); }
-.left-body { flex: 1; overflow-y: auto; padding: 16px 20px; }
+      .left {
+        display: flex;
+        flex-direction: column;
+        border-right: 1px solid var(--border);
+        overflow: hidden;
+      }
+      .left-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 20px;
+        border-bottom: 1px solid var(--border);
+        flex-shrink: 0;
+        background: var(--surface);
+      }
+      .left-body {
+        flex: 1;
+        overflow-y: auto;
+        padding: 16px 20px;
+      }
 
-.right { display: flex; flex-direction: column; overflow: hidden; }
-.right-toolbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-bottom: 1px solid var(--border); flex-shrink: 0; background: var(--surface); }
-.right-body { flex: 1; overflow: auto; padding: 20px 24px; }
+      .right {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      .right-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 20px;
+        border-bottom: 1px solid var(--border);
+        flex-shrink: 0;
+        background: var(--surface);
+      }
+      .right-body {
+        flex: 1;
+        overflow: auto;
+        padding: 20px 24px;
+      }
 
-.slabel { font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
-.ptitle { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+      .slabel {
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 6px;
+      }
+      .ptitle {
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
 
-input[type=text], select {
-  width: 100%; background: var(--bg); border: 1px solid var(--border);
-  border-radius: var(--r); padding: 7px 11px; font-family: var(--sans);
-  font-size: 13px; color: var(--text); outline: none; transition: border-color .15s;
-}
-input[type=text]:focus, select:focus { border-color: var(--accent); }
-input::placeholder { color: var(--muted); }
-select option { background: #1a1a20; }
+      input[type="text"],
+      select {
+        width: 100%;
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: var(--r);
+        padding: 7px 11px;
+        font-family: var(--sans);
+        font-size: 13px;
+        color: var(--text);
+        outline: none;
+        transition: border-color 0.15s;
+      }
+      input[type="text"]:focus,
+      select:focus {
+        border-color: var(--accent);
+      }
+      input::placeholder {
+        color: var(--muted);
+      }
+      select option {
+        background: #1a1a20;
+      }
 
-.add-form {
-  background: rgba(108,142,255,.04); border: 1px dashed rgba(108,142,255,.25);
-  border-radius: var(--r); padding: 16px; margin-bottom: 14px;
-}
-.field { margin-bottom: 10px; }
-.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+      .add-form {
+        background: rgba(108, 142, 255, 0.04);
+        border: 1px dashed rgba(108, 142, 255, 0.25);
+        border-radius: var(--r);
+        padding: 16px;
+        margin-bottom: 14px;
+      }
+      .field {
+        margin-bottom: 10px;
+      }
+      .field-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-bottom: 10px;
+      }
 
-.chips { display: flex; flex-wrap: wrap; gap: 5px; }
-.chip {
-  font-size: 11px; padding: 3px 9px; border-radius: 20px;
-  border: 1px solid var(--border); background: var(--surface2);
-  cursor: pointer; user-select: none; transition: all .12s;
-}
-.chip:hover { border-color: var(--border2); }
-.chip.on { border-color: var(--accent); background: var(--accent-dim); color: var(--accent); }
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+      }
+      .chip {
+        font-size: 11px;
+        padding: 3px 9px;
+        border-radius: 20px;
+        border: 1px solid var(--border);
+        background: var(--surface2);
+        cursor: pointer;
+        user-select: none;
+        transition: all 0.12s;
+      }
+      .chip:hover {
+        border-color: var(--border2);
+      }
+      .chip.on {
+        border-color: var(--accent);
+        background: var(--accent-dim);
+        color: var(--accent);
+      }
 
-.btn {
-  display: inline-flex; align-items: center; gap: 5px;
-  padding: 6px 13px; border-radius: var(--r); font-family: var(--sans);
-  font-size: 12px; font-weight: 500; cursor: pointer; border: 1px solid transparent; transition: all .15s;
-}
-.btn-ghost { background: transparent; border-color: var(--border); color: var(--muted2); }
-.btn-ghost:hover { border-color: var(--border2); color: var(--text); }
-.btn-accent { background: var(--accent); color: #fff; }
-.btn-accent:hover { opacity: .85; }
-.btn-green { background: var(--green); color: #0a0a0a; font-weight: 600; }
-.btn-green:hover { opacity: .85; }
-.btn-red { background: transparent; border-color: transparent; color: var(--red); padding: 4px 8px; }
-.btn-red:hover { background: var(--red-dim); }
-.btn-sm { padding: 4px 9px; font-size: 11px; }
-.row { display: flex; align-items: center; gap: 8px; }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 6px 13px;
+        border-radius: var(--r);
+        font-family: var(--sans);
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        border: 1px solid transparent;
+        transition: all 0.15s;
+      }
+      .btn-ghost {
+        background: transparent;
+        border-color: var(--border);
+        color: var(--muted2);
+      }
+      .btn-ghost:hover {
+        border-color: var(--border2);
+        color: var(--text);
+      }
+      .btn-accent {
+        background: var(--accent);
+        color: #fff;
+      }
+      .btn-accent:hover {
+        opacity: 0.85;
+      }
+      .btn-green {
+        background: var(--green);
+        color: #0a0a0a;
+        font-weight: 600;
+      }
+      .btn-green:hover {
+        opacity: 0.85;
+      }
+      .btn-red {
+        background: transparent;
+        border-color: transparent;
+        color: var(--red);
+        padding: 4px 8px;
+      }
+      .btn-red:hover {
+        background: var(--red-dim);
+      }
+      .btn-sm {
+        padding: 4px 9px;
+        font-size: 11px;
+      }
+      .row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
 
-.tool-card { border: 1px solid var(--border); border-radius: var(--r); background: var(--surface); margin-bottom: 8px; overflow: hidden; }
-.tool-card:hover { border-color: var(--border2); }
-.card-header { display: flex; align-items: center; justify-content: space-between; padding: 9px 13px; cursor: pointer; }
-.card-left { display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1; overflow: hidden; }
-.card-num { font-family: var(--mono); font-size: 10px; color: var(--muted); min-width: 18px; flex-shrink: 0; }
-.card-title { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.card-url { font-family: var(--mono); font-size: 11px; color: var(--muted); margin-left: 4px; white-space: nowrap; flex-shrink: 0; }
-.card-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-.sub-badge { font-size: 10px; padding: 2px 6px; border-radius: 20px; background: var(--accent-dim); color: var(--accent); font-family: var(--mono); }
+      .tool-card {
+        border: 1px solid var(--border);
+        border-radius: var(--r);
+        background: var(--surface);
+        margin-bottom: 8px;
+        overflow: hidden;
+      }
+      .tool-card:hover {
+        border-color: var(--border2);
+      }
+      .card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 9px 13px;
+        cursor: pointer;
+      }
+      .card-left {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+        flex: 1;
+        overflow: hidden;
+      }
+      .card-num {
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--muted);
+        min-width: 18px;
+        flex-shrink: 0;
+      }
+      .card-title {
+        font-size: 13px;
+        font-weight: 500;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .card-url {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--muted);
+        margin-left: 4px;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+      .card-right {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-shrink: 0;
+      }
+      .sub-badge {
+        font-size: 10px;
+        padding: 2px 6px;
+        border-radius: 20px;
+        background: var(--accent-dim);
+        color: var(--accent);
+        font-family: var(--mono);
+      }
 
-.edit-area { border-top: 1px solid var(--border); padding: 14px; background: rgba(0,0,0,.25); }
+      .edit-area {
+        border-top: 1px solid var(--border);
+        padding: 14px;
+        background: rgba(0, 0, 0, 0.25);
+      }
 
-.subtool-block { background: rgba(0,0,0,.3); border: 1px solid var(--border); border-radius: var(--r); margin-top: 4px; }
-.subtool-item { padding: 12px; border-bottom: 1px solid var(--border); }
-.subtool-item:last-child { border-bottom: none; }
-.subtool-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-.subtool-name-label { font-size: 11px; font-weight: 600; color: var(--muted2); font-family: var(--mono); }
+      .subtool-block {
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--border);
+        border-radius: var(--r);
+        margin-top: 4px;
+      }
+      .subtool-item {
+        padding: 12px;
+        border-bottom: 1px solid var(--border);
+      }
+      .subtool-item:last-child {
+        border-bottom: none;
+      }
+      .subtool-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 8px;
+      }
+      .subtool-name-label {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--muted2);
+        font-family: var(--mono);
+      }
 
-.empty { text-align: center; padding: 32px; color: var(--muted); font-size: 13px; border: 1px dashed var(--border); border-radius: var(--r); }
+      .empty {
+        text-align: center;
+        padding: 32px;
+        color: var(--muted);
+        font-size: 13px;
+        border: 1px dashed var(--border);
+        border-radius: var(--r);
+      }
 
-pre { font-family: var(--mono); font-size: 12px; line-height: 1.75; white-space: pre; color: #abb2bf; }
-.kw { color: #c678dd; } .str { color: #98c379; } .cm { color: #5c6370; font-style: italic; }
+      pre {
+        font-family: var(--mono);
+        font-size: 12px;
+        line-height: 1.75;
+        white-space: pre;
+        color: #abb2bf;
+      }
+      .kw {
+        color: #c678dd;
+      }
+      .str {
+        color: #98c379;
+      }
+      .cm {
+        color: #5c6370;
+        font-style: italic;
+      }
 
-.toast { position: fixed; bottom: 20px; right: 20px; background: var(--green); color: #0a0a0a; font-size: 12px; font-weight: 600; padding: 9px 16px; border-radius: var(--r); opacity: 0; transform: translateY(6px); transition: all .2s; pointer-events: none; z-index: 999; }
-.toast.show { opacity: 1; transform: translateY(0); }
+      .toast {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: var(--green);
+        color: #0a0a0a;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 9px 16px;
+        border-radius: var(--r);
+        opacity: 0;
+        transform: translateY(6px);
+        transition: all 0.2s;
+        pointer-events: none;
+        z-index: 999;
+      }
+      .toast.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
 
-::-webkit-scrollbar { width: 4px; height: 4px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
-</style>
-</head>
-<body>
-
-<header>
-  <div class="logo">
-    <div class="dot"></div>
-    ENIC MIS
-    <span class="pill">tools.ts generator</span>
-  </div>
-  <span class="header-hint">Edit on the left · output updates live on the right</span>
-</header>
-
-<div class="layout">
-  <div class="left">
-    <div class="left-toolbar">
-      <span class="ptitle">Tools</span>
-      <button class="btn btn-accent btn-sm" onclick="toggleAdd()">+ Add Tool</button>
-    </div>
-    <div class="left-body">
-
-      <div id="addForm" style="display:none" class="add-form">
-        <div class="field-row">
-          <div class="field">
-            <div class="slabel">Title</div>
-            <input type="text" id="nTitle" placeholder="e.g. Reports" />
-          </div>
-          <div class="field">
-            <div class="slabel">URL <span style="color:var(--muted);font-size:9px">(blank = has subtools)</span></div>
-            <input type="text" id="nUrl" placeholder="/reports" />
-          </div>
-        </div>
-        <div class="field">
-          <div class="slabel">Description</div>
-          <input type="text" id="nDesc" placeholder="Short description" />
-        </div>
-        <div class="field-row">
-          <div class="field">
-            <div class="slabel">Icon (lucide name)</div>
-            <input type="text" id="nIcon" placeholder="e.g. BarChart2" />
-          </div>
-        </div>
-        <div class="field">
-          <div class="slabel">Allowed Roles</div>
-          <div class="chips" id="nRolesChips"></div>
-        </div>
-        <div class="row" style="margin-top:12px">
-          <button class="btn btn-ghost btn-sm" onclick="toggleAdd()">Cancel</button>
-          <button class="btn btn-accent btn-sm" onclick="commitAdd()">Add</button>
-        </div>
+      ::-webkit-scrollbar {
+        width: 4px;
+        height: 4px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--border2);
+        border-radius: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="logo">
+        <div class="dot"></div>
+        ENIC MIS
+        <span class="pill">tools.ts generator</span>
       </div>
-
-      <div id="toolList"></div>
-    </div>
-  </div>
-
-  <div class="right">
-    <div class="right-toolbar">
-      <span class="ptitle">Generated tools.ts</span>
       <div class="row">
-        <button class="btn btn-ghost btn-sm" onclick="doCopy()">Copy</button>
-        <button class="btn btn-green btn-sm" onclick="doDownload()">↓ Download</button>
+        <span
+          id="saveIndicator"
+          class="header-hint"
+          style="opacity: 0; transition: opacity 0.3s"
+          >✓ saved</span
+        >
+        <span class="header-hint" style="margin: 0 8px; color: var(--border2)"
+          >|</span
+        >
+        <span class="header-hint">Edit on the left · output updates live</span>
+        <span class="header-hint" style="margin: 0 8px; color: var(--border2)"
+          >|</span
+        >
+        <button
+          class="btn btn-ghost btn-sm"
+          onclick="openImport()"
+          style="font-size: 11px"
+        >
+          ⬆ Import tools.ts
+        </button>
+        <button
+          class="btn btn-ghost btn-sm"
+          onclick="resetToDefaults()"
+          style="font-size: 11px; color: var(--red)"
+        >
+          ↺ Reset
+        </button>
+      </div>
+    </header>
+
+    <div class="layout">
+      <div class="left">
+        <div class="left-toolbar">
+          <span class="ptitle">Tools</span>
+          <button class="btn btn-accent btn-sm" onclick="toggleAdd()">
+            + Add Tool
+          </button>
+        </div>
+        <div class="left-body">
+          <div id="addForm" style="display: none" class="add-form">
+            <div class="field-row">
+              <div class="field">
+                <div class="slabel">Title</div>
+                <input type="text" id="nTitle" placeholder="e.g. Reports" />
+              </div>
+              <div class="field">
+                <div class="slabel">
+                  URL
+                  <span style="color: var(--muted); font-size: 9px"
+                    >(blank = has subtools)</span
+                  >
+                </div>
+                <input type="text" id="nUrl" placeholder="/reports" />
+              </div>
+            </div>
+            <div class="field">
+              <div class="slabel">Description</div>
+              <input type="text" id="nDesc" placeholder="Short description" />
+            </div>
+            <div class="field-row">
+              <div class="field">
+                <div class="slabel">Icon (lucide name)</div>
+                <input type="text" id="nIcon" placeholder="e.g. BarChart2" />
+              </div>
+            </div>
+            <div class="field">
+              <div class="slabel">Allowed Roles</div>
+              <div class="chips" id="nRolesChips"></div>
+            </div>
+            <div class="row" style="margin-top: 12px">
+              <button class="btn btn-ghost btn-sm" onclick="toggleAdd()">
+                Cancel
+              </button>
+              <button class="btn btn-accent btn-sm" onclick="commitAdd()">
+                Add
+              </button>
+            </div>
+          </div>
+
+          <div id="toolList"></div>
+        </div>
+      </div>
+
+      <div class="right">
+        <div class="right-toolbar">
+          <span class="ptitle">Generated tools.ts</span>
+          <div class="row">
+            <button class="btn btn-ghost btn-sm" onclick="doCopy()">
+              Copy
+            </button>
+            <button class="btn btn-green btn-sm" onclick="doDownload()">
+              ↓ Download
+            </button>
+          </div>
+        </div>
+        <div class="right-body">
+          <pre id="out"></pre>
+        </div>
       </div>
     </div>
-    <div class="right-body">
-      <pre id="out"></pre>
+
+    <!-- Import modal -->
+    <div
+      id="importModal"
+      style="
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 200;
+        display: none;
+        align-items: center;
+        justify-content: center;
+      "
+    >
+      <div
+        style="
+          background: var(--surface);
+          border: 1px solid var(--border2);
+          border-radius: 10px;
+          width: 640px;
+          max-width: 90vw;
+          max-height: 80vh;
+          display: flex;
+          flex-direction: column;
+          overflow: hidden;
+        "
+      >
+        <div
+          style="
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+          "
+        >
+          <span style="font-size: 13px; font-weight: 600">Import tools.ts</span>
+          <button class="btn btn-ghost btn-sm" onclick="closeImport()">
+            ✕
+          </button>
+        </div>
+        <div style="padding: 16px 20px; flex: 1; overflow: auto">
+          <p style="font-size: 12px; color: var(--muted2); margin-bottom: 10px">
+            Paste the full contents of your
+            <code
+              style="
+                font-family: var(--mono);
+                font-size: 11px;
+                color: var(--accent);
+              "
+              >src/data/tools.ts</code
+            >
+            file below:
+          </p>
+          <textarea
+            id="importText"
+            spellcheck="false"
+            placeholder="Paste your tools.ts here..."
+            style="
+              width: 100%;
+              height: 320px;
+              background: var(--bg);
+              border: 1px solid var(--border);
+              border-radius: 6px;
+              padding: 12px;
+              font-family: var(--mono);
+              font-size: 12px;
+              color: var(--text);
+              outline: none;
+              resize: vertical;
+              line-height: 1.6;
+            "
+          ></textarea>
+          <div
+            id="importError"
+            style="
+              display: none;
+              margin-top: 8px;
+              padding: 8px 12px;
+              background: var(--red-dim);
+              border: 1px solid var(--red);
+              border-radius: 6px;
+              font-size: 12px;
+              color: var(--red);
+            "
+          ></div>
+        </div>
+        <div
+          style="
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            padding: 14px 20px;
+            border-top: 1px solid var(--border);
+          "
+        >
+          <button class="btn btn-ghost btn-sm" onclick="closeImport()">
+            Cancel
+          </button>
+          <button class="btn btn-accent btn-sm" onclick="doImport()">
+            Load into editor
+          </button>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
 
-<div class="toast" id="toast">✓ Copied!</div>
+    <script>
+      const ROLES = [
+        "superadmin",
+        "admin",
+        "guest",
+        "dev",
+        "operations",
+        "marketing",
+        "managers",
+        "documentations",
+        "it",
+        "others",
+      ];
 
-<script>
-const ROLES = ['superadmin','admin','guest','dev','operations','marketing','managers','documentations','it','others'];
+      // ── Persistence ───────────────────────────────────────────────────────────
+      const STORAGE_KEY = "enic-tools-generator";
 
-// ── Default tools matching actual tools.ts ─────────────────────────────────
-let tools = [
-  {
-    title:'Home', url:'/home', icon:'Home',
-    description:'Welcome dashboard and main landing page',
-    allowedRoles:[], subtools:[]
-  },
-  {
-    title:'Dashboard', url:'/dashboard', icon:'LayoutDashboard',
-    description:'View system stats and analytics',
-    allowedRoles:['superadmin','admin'], subtools:[],
-    existingComponent:'Dashboard'  // already built
-  },
-  {
-    title:'User Management', url:'/users', icon:'User2Icon',
-    description:'Manage users, roles, and permissions',
-    allowedRoles:['superadmin','admin'], subtools:[],
-    existingComponent:'UserManagementPage'
-  },
-  {
-    title:'Inventory & Assets', url:'', icon:'CirclePile',
-    description:'Track and manage inventory and assets',
-    allowedRoles:['superadmin','admin','operations'],
-    subtools:[
-      { title:'Asset List', url:'/inventory/assets', description:'View and edit all assets', allowedRoles:['superadmin','admin','operations'], existingComponent:'AssetListPage' },
-      { title:'Asset Reports', url:'/inventory/reports', description:'Generate inventory and asset reports', allowedRoles:['superadmin'] },
-    ]
-  },
-  {
-    title:'Operations', url:'', icon:'HardHat',
-    description:'Manage daily operations workflow',
-    allowedRoles:['superadmin','operations'],
-    subtools:[
-      { title:'Task Board', url:'/operations/tasks', description:'View and manage tasks', allowedRoles:['superadmin','operations'] },
-      { title:'Shift Schedules', url:'/operations/shifts', description:'Manage employee shifts', allowedRoles:['superadmin'] },
-    ]
-  },
-  {
-    title:'Finance', url:'', icon:'BadgeDollarSign',
-    description:'Financial management tools and reports',
-    allowedRoles:['superadmin','managers'],
-    subtools:[
-      { title:'Expense Tracker', url:'/finance/expenses', description:'Track company expenses', allowedRoles:['superadmin','managers'] },
-      { title:'Budget Planner', url:'/finance/budget', description:'Plan and monitor budgets', allowedRoles:['superadmin','managers'] },
-    ]
-  },
-  {
-    title:'Marketing', url:'', icon:'HandshakeIcon',
-    description:'CRM and marketing tools',
-    allowedRoles:['superadmin','marketing'],
-    subtools:[
-      { title:'Campaigns', url:'/marketing/campaigns', description:'Manage marketing campaigns', allowedRoles:['superadmin','marketing'] },
-      { title:'Leads', url:'/marketing/leads', description:'View and manage leads', allowedRoles:['superadmin','marketing'] },
-    ]
-  },
-  {
-    title:'AI Assistant', url:'/ai-assistant', icon:'BotIcon',
-    description:'AI-powered workflow assistant',
-    allowedRoles:['superadmin','admin'], subtools:[]
-  },
-];
+      function save() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(tools));
+          const ind = document.getElementById("saveIndicator");
+          if (ind) {
+            ind.style.opacity = "1";
+            setTimeout(() => (ind.style.opacity = "0"), 1500);
+          }
+        } catch (e) {}
+      }
 
-// Track which edit panels are open so re-render keeps them open
-const openPanels = new Set();
+      function loadSaved() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (raw) return JSON.parse(raw);
+        } catch (e) {}
+        return null;
+      }
 
-// ── Render editor ──────────────────────────────────────────────────────────
-function render() {
-  const list = document.getElementById('toolList');
-  if (!tools.length) { list.innerHTML = '<div class="empty">No tools. Click + Add Tool.</div>'; renderOut(); return; }
+      function resetToDefaults() {
+        if (!confirm("Reset all tools to defaults? Your changes will be lost."))
+          return;
+        localStorage.removeItem(STORAGE_KEY);
+        tools = getDefaultTools();
+        openPanels.clear();
+        render();
+      }
 
-  list.innerHTML = tools.map((t, i) => `
+      function getDefaultTools() {
+        return [
+          {
+            title: "Home",
+            url: "/home",
+            icon: "Home",
+            description: "Welcome dashboard and main landing page",
+            allowedRoles: [],
+            subtools: [],
+          },
+          {
+            title: "Dashboard",
+            url: "/dashboard",
+            icon: "LayoutDashboard",
+            description: "View system stats and analytics",
+            allowedRoles: ["superadmin", "admin"],
+            subtools: [],
+            existingComponent: "Dashboard", // already built
+          },
+          {
+            title: "User Management",
+            url: "/users",
+            icon: "User2Icon",
+            description: "Manage users, roles, and permissions",
+            allowedRoles: ["superadmin", "admin"],
+            subtools: [],
+            existingComponent: "UserManagementPage",
+          },
+          {
+            title: "Inventory & Assets",
+            url: "",
+            icon: "CirclePile",
+            description: "Track and manage inventory and assets",
+            allowedRoles: ["superadmin", "admin", "operations"],
+            subtools: [
+              {
+                title: "Asset List",
+                url: "/inventory/assets",
+                description: "View and edit all assets",
+                allowedRoles: ["superadmin", "admin", "operations"],
+                existingComponent: "AssetListPage",
+              },
+              {
+                title: "Asset Reports",
+                url: "/inventory/reports",
+                description: "Generate inventory and asset reports",
+                allowedRoles: ["superadmin"],
+              },
+            ],
+          },
+          {
+            title: "Operations",
+            url: "",
+            icon: "HardHat",
+            description: "Manage daily operations workflow",
+            allowedRoles: ["superadmin", "operations"],
+            subtools: [
+              {
+                title: "Task Board",
+                url: "/operations/tasks",
+                description: "View and manage tasks",
+                allowedRoles: ["superadmin", "operations"],
+              },
+              {
+                title: "Shift Schedules",
+                url: "/operations/shifts",
+                description: "Manage employee shifts",
+                allowedRoles: ["superadmin"],
+              },
+            ],
+          },
+          {
+            title: "Finance",
+            url: "",
+            icon: "BadgeDollarSign",
+            description: "Financial management tools and reports",
+            allowedRoles: ["superadmin", "managers"],
+            subtools: [
+              {
+                title: "Expense Tracker",
+                url: "/finance/expenses",
+                description: "Track company expenses",
+                allowedRoles: ["superadmin", "managers"],
+              },
+              {
+                title: "Budget Planner",
+                url: "/finance/budget",
+                description: "Plan and monitor budgets",
+                allowedRoles: ["superadmin", "managers"],
+              },
+            ],
+          },
+          {
+            title: "Marketing",
+            url: "",
+            icon: "HandshakeIcon",
+            description: "CRM and marketing tools",
+            allowedRoles: ["superadmin", "marketing"],
+            subtools: [
+              {
+                title: "Campaigns",
+                url: "/marketing/campaigns",
+                description: "Manage marketing campaigns",
+                allowedRoles: ["superadmin", "marketing"],
+              },
+              {
+                title: "Leads",
+                url: "/marketing/leads",
+                description: "View and manage leads",
+                allowedRoles: ["superadmin", "marketing"],
+              },
+            ],
+          },
+          {
+            title: "AI Assistant",
+            url: "/ai-assistant",
+            icon: "BotIcon",
+            description: "AI-powered workflow assistant",
+            allowedRoles: ["superadmin", "admin"],
+            subtools: [],
+          },
+        ];
+      }
+
+      // Load from localStorage or fall back to defaults
+      let tools = loadSaved() || getDefaultTools();
+
+      // Track which edit panels are open so re-render keeps them open
+      const openPanels = new Set();
+
+      // ── Render editor ──────────────────────────────────────────────────────────
+      function render() {
+        const list = document.getElementById("toolList");
+        if (!tools.length) {
+          list.innerHTML =
+            '<div class="empty">No tools. Click + Add Tool.</div>';
+          renderOut();
+          return;
+        }
+
+        list.innerHTML = tools
+          .map(
+            (t, i) => `
     <div class="tool-card">
       <div class="card-header" onclick="toggleEdit(${i})">
         <div class="card-left">
-          <span class="card-num">${String(i+1).padStart(2,'0')}</span>
+          <span class="card-num">${String(i + 1).padStart(2, "0")}</span>
           <span class="card-title">${esc(t.title)}</span>
-          <span class="card-url">${t.url ? esc(t.url) : ''}</span>
+          <span class="card-url">${t.url ? esc(t.url) : ""}</span>
         </div>
         <div class="card-right">
-          ${t.subtools && t.subtools.length ? `<span class="sub-badge">${t.subtools.length} sub</span>` : ''}
-          ${t.existingComponent ? `<span class="sub-badge" style="background:var(--green);color:#0a0a0a;opacity:.8">built</span>` : ''}
+          ${
+            t.subtools && t.subtools.length
+              ? `<span class="sub-badge">${t.subtools.length} sub</span>`
+              : ""
+          }
+          ${
+            t.existingComponent
+              ? `<span class="sub-badge" style="background:var(--green);color:#0a0a0a;opacity:.8">built</span>`
+              : ""
+          }
           <button class="btn btn-red btn-sm" onclick="event.stopPropagation();removeTool(${i})">✕</button>
         </div>
       </div>
-      <div id="ea-${i}" style="display:${openPanels.has(i)?'block':'none'}">
+      <div id="ea-${i}" style="display:${openPanels.has(i) ? "block" : "none"}">
         <div class="edit-area">
 
           <div class="field-row" style="margin-bottom:10px">
@@ -283,7 +867,7 @@ function render() {
             </div>
             <div>
               <div class="slabel">URL</div>
-              <input type="text" value="${esc(t.url||'')}"
+              <input type="text" value="${esc(t.url || "")}"
                 oninput="tools[${i}].url=this.value;renderOut()"
                 placeholder="/path or blank if parent" />
             </div>
@@ -291,14 +875,14 @@ function render() {
 
           <div style="margin-bottom:10px">
             <div class="slabel">Description</div>
-            <input type="text" value="${esc(t.description||'')}"
+            <input type="text" value="${esc(t.description || "")}"
               oninput="tools[${i}].description=this.value;renderOut()"
               placeholder="Short description" />
           </div>
 
           <div style="margin-bottom:12px">
             <div class="slabel">Icon (lucide name)</div>
-            <input type="text" value="${esc(t.icon||'')}"
+            <input type="text" value="${esc(t.icon || "")}"
               oninput="tools[${i}].icon=this.value;renderOut()"
               placeholder="e.g. BarChart2" />
           </div>
@@ -306,10 +890,14 @@ function render() {
           <div style="margin-bottom:16px">
             <div class="slabel">Allowed Roles</div>
             <div class="chips" id="roles-${i}">
-              ${ROLES.map(r => `
-                <span class="chip ${(t.allowedRoles||[]).includes(r)?'on':''}"
+              ${ROLES.map(
+                (r) => `
+                <span class="chip ${
+                  (t.allowedRoles || []).includes(r) ? "on" : ""
+                }"
                   onclick="togRole(${i},-1,'${r}')">${r}</span>
-              `).join('')}
+              `
+              ).join("")}
             </div>
           </div>
 
@@ -318,12 +906,22 @@ function render() {
               <span class="slabel" style="margin-bottom:0">Subtools</span>
               <button class="btn btn-ghost btn-sm" onclick="addSub(${i})">+ Add Subtool</button>
             </div>
-            ${t.subtools && t.subtools.length ? `
+            ${
+              t.subtools && t.subtools.length
+                ? `
               <div class="subtool-block">
-                ${t.subtools.map((s,j) => `
+                ${t.subtools
+                  .map(
+                    (s, j) => `
                   <div class="subtool-item">
                     <div class="subtool-header">
-                      <span class="subtool-name-label">${esc(s.title)||'untitled'}${s.existingComponent ? ' <span style="color:var(--green);font-size:10px">✓ built</span>' : ''}</span>
+                      <span class="subtool-name-label">${
+                        esc(s.title) || "untitled"
+                      }${
+                      s.existingComponent
+                        ? ' <span style="color:var(--green);font-size:10px">✓ built</span>'
+                        : ""
+                    }</span>
                       <button class="btn btn-red btn-sm" onclick="removeSub(${i},${j})">✕</button>
                     </div>
                     <div class="field-row" style="margin-bottom:8px">
@@ -342,180 +940,251 @@ function render() {
                     </div>
                     <div style="margin-bottom:8px">
                       <div class="slabel">Description</div>
-                      <input type="text" value="${esc(s.description||'')}"
+                      <input type="text" value="${esc(s.description || "")}"
                         oninput="tools[${i}].subtools[${j}].description=this.value;renderOut()"
                         placeholder="Description" />
                     </div>
                     <div>
                       <div class="slabel">Allowed Roles</div>
                       <div class="chips" id="sroles-${i}-${j}">
-                        ${ROLES.map(r => `
-                          <span class="chip ${(s.allowedRoles||[]).includes(r)?'on':''}"
+                        ${ROLES.map(
+                          (r) => `
+                          <span class="chip ${
+                            (s.allowedRoles || []).includes(r) ? "on" : ""
+                          }"
                             onclick="togRole(${i},${j},'${r}')">${r}</span>
-                        `).join('')}
+                        `
+                        ).join("")}
                       </div>
                     </div>
                   </div>
-                `).join('')}
+                `
+                  )
+                  .join("")}
               </div>
-            ` : `<div style="color:var(--muted);font-size:12px;padding:4px 0">No subtools.</div>`}
+            `
+                : `<div style="color:var(--muted);font-size:12px;padding:4px 0">No subtools.</div>`
+            }
           </div>
         </div>
       </div>
     </div>
-  `).join('');
-  renderOut();
-}
+  `
+          )
+          .join("");
+        renderOut();
+        save();
+      }
 
-// ── Toggle edit — tracks open state so re-render doesn't collapse ──────────
-function toggleEdit(i) {
-  if (openPanels.has(i)) openPanels.delete(i);
-  else openPanels.add(i);
-  const el = document.getElementById(`ea-${i}`);
-  if (el) el.style.display = openPanels.has(i) ? 'block' : 'none';
-}
+      // ── Toggle edit — tracks open state so re-render doesn't collapse ──────────
+      function toggleEdit(i) {
+        if (openPanels.has(i)) openPanels.delete(i);
+        else openPanels.add(i);
+        const el = document.getElementById(`ea-${i}`);
+        if (el) el.style.display = openPanels.has(i) ? "block" : "none";
+      }
 
-// ── Role toggle — does NOT re-render the full list, just toggles the chip ──
-function togRole(ti, si, role) {
-  const arr = si === -1 ? tools[ti].allowedRoles : tools[ti].subtools[si].allowedRoles;
-  const idx = arr.indexOf(role);
-  if (idx > -1) arr.splice(idx,1); else arr.push(role);
+      // ── Role toggle — does NOT re-render the full list, just toggles the chip ──
+      function togRole(ti, si, role) {
+        const arr =
+          si === -1
+            ? tools[ti].allowedRoles
+            : tools[ti].subtools[si].allowedRoles;
+        const idx = arr.indexOf(role);
+        if (idx > -1) arr.splice(idx, 1);
+        else arr.push(role);
 
-  // Only update the chips container, not the whole list
-  const containerId = si === -1 ? `roles-${ti}` : `sroles-${ti}-${si}`;
-  const container = document.getElementById(containerId);
-  if (container) {
-    container.querySelectorAll('.chip').forEach(chip => {
-      chip.classList.toggle('on', arr.includes(chip.textContent.trim()));
-    });
-  }
-  renderOut();
-}
+        // Only update the chips container, not the whole list
+        const containerId = si === -1 ? `roles-${ti}` : `sroles-${ti}-${si}`;
+        const container = document.getElementById(containerId);
+        if (container) {
+          container.querySelectorAll(".chip").forEach((chip) => {
+            chip.classList.toggle("on", arr.includes(chip.textContent.trim()));
+          });
+        }
+        renderOut();
+        save();
+      }
 
-// Update subtool label in header without full re-render
-function renderSubLabel(ti, ji) {
-  renderOut();
-}
+      // Update subtool label in header without full re-render
+      function renderSubLabel(ti, ji) {
+        renderOut();
+      }
 
-function removeTool(i) {
-  openPanels.delete(i);
-  // Shift open panel indices
-  const newOpen = new Set();
-  openPanels.forEach(idx => { if (idx < i) newOpen.add(idx); else if (idx > i) newOpen.add(idx-1); });
-  openPanels.clear(); newOpen.forEach(v => openPanels.add(v));
-  tools.splice(i,1); render();
-}
+      function removeTool(i) {
+        openPanels.delete(i);
+        // Shift open panel indices
+        const newOpen = new Set();
+        openPanels.forEach((idx) => {
+          if (idx < i) newOpen.add(idx);
+          else if (idx > i) newOpen.add(idx - 1);
+        });
+        openPanels.clear();
+        newOpen.forEach((v) => openPanels.add(v));
+        tools.splice(i, 1);
+        render();
+      }
 
-function addSub(i) {
-  tools[i].subtools.push({title:'New Subtool',url:'',description:'',allowedRoles:[]});
-  render();
-}
+      function addSub(i) {
+        tools[i].subtools.push({
+          title: "New Subtool",
+          url: "",
+          description: "",
+          allowedRoles: [],
+        });
+        render();
+      }
 
-function removeSub(ti,si) { tools[ti].subtools.splice(si,1); render(); }
+      function removeSub(ti, si) {
+        tools[ti].subtools.splice(si, 1);
+        render();
+      }
 
-// ── Add form ───────────────────────────────────────────────────────────────
-let nRoles = [];
-function toggleAdd() {
-  const f = document.getElementById('addForm');
-  const open = f.style.display === 'none';
-  f.style.display = open ? 'block' : 'none';
-  if (open) {
-    nRoles = [];
-    document.getElementById('nRolesChips').innerHTML = ROLES.map(r =>
-      `<span class="chip" id="nr-${r}" onclick="togNRole('${r}')">${r}</span>`
-    ).join('');
-  }
-}
-function togNRole(r) {
-  const i = nRoles.indexOf(r); if (i>-1) nRoles.splice(i,1); else nRoles.push(r);
-  document.getElementById(`nr-${r}`).classList.toggle('on', nRoles.includes(r));
-}
-function commitAdd() {
-  const title = document.getElementById('nTitle').value.trim();
-  if (!title) { alert('Title is required'); return; }
-  tools.push({
-    title, url: document.getElementById('nUrl').value.trim(),
-    icon: document.getElementById('nIcon').value.trim(),
-    description: document.getElementById('nDesc').value.trim(),
-    allowedRoles: [...nRoles], subtools:[]
-  });
-  ['nTitle','nUrl','nIcon','nDesc'].forEach(id => document.getElementById(id).value='');
-  toggleAdd(); render();
-}
+      // ── Add form ───────────────────────────────────────────────────────────────
+      let nRoles = [];
+      function toggleAdd() {
+        const f = document.getElementById("addForm");
+        const open = f.style.display === "none";
+        f.style.display = open ? "block" : "none";
+        if (open) {
+          nRoles = [];
+          document.getElementById("nRolesChips").innerHTML = ROLES.map(
+            (r) =>
+              `<span class="chip" id="nr-${r}" onclick="togNRole('${r}')">${r}</span>`
+          ).join("");
+        }
+      }
+      function togNRole(r) {
+        const i = nRoles.indexOf(r);
+        if (i > -1) nRoles.splice(i, 1);
+        else nRoles.push(r);
+        document
+          .getElementById(`nr-${r}`)
+          .classList.toggle("on", nRoles.includes(r));
+      }
+      function commitAdd() {
+        const title = document.getElementById("nTitle").value.trim();
+        if (!title) {
+          alert("Title is required");
+          return;
+        }
+        tools.push({
+          title,
+          url: document.getElementById("nUrl").value.trim(),
+          icon: document.getElementById("nIcon").value.trim(),
+          description: document.getElementById("nDesc").value.trim(),
+          allowedRoles: [...nRoles],
+          subtools: [],
+        });
+        ["nTitle", "nUrl", "nIcon", "nDesc"].forEach(
+          (id) => (document.getElementById(id).value = "")
+        );
+        toggleAdd();
+        render();
+      }
 
-// ── Generate TS ────────────────────────────────────────────────────────────
-function generateTS() {
-  const icons = [...new Set(tools.filter(t=>t.icon).map(t=>t.icon))];
+      // ── Generate TS ────────────────────────────────────────────────────────────
+      function generateTS() {
+        const icons = [
+          ...new Set(tools.filter((t) => t.icon).map((t) => t.icon)),
+        ];
 
-  // Lazy imports — already-built ones as active, others as comments
-  const lazyLines = [];
-  tools.forEach(t => {
-    if (!t.url || t.title === 'Home') return;
-    const name = t.existingComponent || pascal(t.title);
-    const path = guessPath(t.title, t.url);
-    if (t.existingComponent) lazyLines.push(`const ${name} = lazy(() => import("${path}"));`);
-    else lazyLines.push(`// const ${name} = lazy(() => import("${path}"));`);
-  });
-  tools.forEach(t => {
-    (t.subtools||[]).forEach(s => {
-      const name = s.existingComponent || pascal(s.title);
-      const path = guessSubPath(s.url, s.title);
-      if (s.existingComponent) lazyLines.push(`const ${name} = lazy(() => import("${path}"));`);
-      else lazyLines.push(`// const ${name} = lazy(() => import("${path}"));`);
-    });
-  });
+        // Lazy imports — already-built ones as active, others as comments
+        const lazyLines = [];
+        tools.forEach((t) => {
+          if (!t.url || t.title === "Home") return;
+          const name = t.existingComponent || pascal(t.title);
+          const path = guessPath(t.title, t.url);
+          if (t.existingComponent)
+            lazyLines.push(`const ${name} = lazy(() => import("${path}"));`);
+          else
+            lazyLines.push(`// const ${name} = lazy(() => import("${path}"));`);
+        });
+        tools.forEach((t) => {
+          (t.subtools || []).forEach((s) => {
+            const name = s.existingComponent || pascal(s.title);
+            const path = guessSubPath(s.url, s.title);
+            if (s.existingComponent)
+              lazyLines.push(`const ${name} = lazy(() => import("${path}"));`);
+            else
+              lazyLines.push(
+                `// const ${name} = lazy(() => import("${path}"));`
+              );
+          });
+        });
 
-  // toolsData
-  const toolsStr = tools.map(t => {
-    const lines = ['  {'];
-    lines.push(`    title: "${t.title}",`);
-    if (t.url) lines.push(`    url: "${t.url}",`);
-    if (t.icon) lines.push(`    icon: ${t.icon},`);
-    if (t.description) lines.push(`    description: "${t.description}",`);
-    if (t.allowedRoles?.length) lines.push(`    allowedRoles: [${t.allowedRoles.map(r=>`"${r}"`).join(', ')}],`);
-    if (t.url && t.title !== 'Home') {
-      const name = t.existingComponent || pascal(t.title);
-      if (t.existingComponent) lines.push(`    component: ${name},`);
-      else lines.push(`    // component: ${name},`);
-    }
-    if (t.subtools?.length) {
-      lines.push('    subtools: [');
-      t.subtools.forEach(s => {
-        const sname = s.existingComponent || pascal(s.title);
-        lines.push('      {');
-        lines.push(`        title: "${s.title}",`);
-        lines.push(`        url: "${s.url}",`);
-        if (s.description) lines.push(`        description: "${s.description}",`);
-        if (s.allowedRoles?.length) lines.push(`        allowedRoles: [${s.allowedRoles.map(r=>`"${r}"`).join(', ')}],`);
-        if (s.existingComponent) lines.push(`        component: ${sname},`);
-        else lines.push(`        // component: ${sname},`);
-        lines.push('      },');
-      });
-      lines.push('    ],');
-    }
-    lines.push('  },');
-    return lines.join('\n');
-  }).join('\n');
+        // toolsData
+        const toolsStr = tools
+          .map((t) => {
+            const lines = ["  {"];
+            lines.push(`    title: "${t.title}",`);
+            if (t.url) lines.push(`    url: "${t.url}",`);
+            if (t.icon) lines.push(`    icon: ${t.icon},`);
+            if (t.description)
+              lines.push(`    description: "${t.description}",`);
+            if (t.allowedRoles?.length)
+              lines.push(
+                `    allowedRoles: [${t.allowedRoles
+                  .map((r) => `"${r}"`)
+                  .join(", ")}],`
+              );
+            if (t.url && t.title !== "Home") {
+              const name = t.existingComponent || pascal(t.title);
+              if (t.existingComponent) lines.push(`    component: ${name},`);
+              else lines.push(`    // component: ${name},`);
+            }
+            if (t.subtools?.length) {
+              lines.push("    subtools: [");
+              t.subtools.forEach((s) => {
+                const sname = s.existingComponent || pascal(s.title);
+                lines.push("      {");
+                lines.push(`        title: "${s.title}",`);
+                lines.push(`        url: "${s.url}",`);
+                if (s.description)
+                  lines.push(`        description: "${s.description}",`);
+                if (s.allowedRoles?.length)
+                  lines.push(
+                    `        allowedRoles: [${s.allowedRoles
+                      .map((r) => `"${r}"`)
+                      .join(", ")}],`
+                  );
+                if (s.existingComponent)
+                  lines.push(`        component: ${sname},`);
+                else lines.push(`        // component: ${sname},`);
+                lines.push("      },");
+              });
+              lines.push("    ],");
+            }
+            lines.push("  },");
+            return lines.join("\n");
+          })
+          .join("\n");
 
-  // Checklist
-  const checklist = [];
-  tools.forEach(t => {
-    if (!t.url || t.title === 'Home') return;
-    const done = !!t.existingComponent;
-    const path = guessPath(t.title, t.url);
-    checklist.push(`//   [${done?'x':' '}] ${pascal(t.title)}Page  →  ${path}.tsx`);
-  });
-  tools.forEach(t => {
-    (t.subtools||[]).forEach(s => {
-      const done = !!s.existingComponent;
-      const path = guessSubPath(s.url, s.title);
-      checklist.push(`//   [${done?'x':' '}] ${pascal(s.title)}Page  →  ${path}.tsx`);
-    });
-  });
+        // Checklist
+        const checklist = [];
+        tools.forEach((t) => {
+          if (!t.url || t.title === "Home") return;
+          const done = !!t.existingComponent;
+          const path = guessPath(t.title, t.url);
+          checklist.push(
+            `//   [${done ? "x" : " "}] ${pascal(t.title)}Page  →  ${path}.tsx`
+          );
+        });
+        tools.forEach((t) => {
+          (t.subtools || []).forEach((s) => {
+            const done = !!s.existingComponent;
+            const path = guessSubPath(s.url, s.title);
+            checklist.push(
+              `//   [${done ? "x" : " "}] ${pascal(
+                s.title
+              )}Page  →  ${path}.tsx`
+            );
+          });
+        });
 
-  return `import type { ElementType, ComponentType } from "react";
+        return `import type { ElementType, ComponentType } from "react";
 import {
-${icons.map(ic=>`  ${ic},`).join('\n')}
+${icons.map((ic) => `  ${ic},`).join("\n")}
 } from "lucide-react";
 import { lazy } from "react";
 import type { UserRole } from "./schema";
@@ -545,7 +1214,7 @@ export interface Tool {
 //   3. Set component: ComponentName on the matching tool/subtool entry
 //   4. Done — route, sidebar, home card, command menu all just work
 // ---------------------------------------------------------------------------
-${lazyLines.join('\n')}
+${lazyLines.join("\n")}
 
 export const toolsData: Tool[] = [
 ${toolsStr}
@@ -566,56 +1235,178 @@ export function hasAccess(
 // ---------------------------------------------------------------------------
 // Components to create — check off as you build each page
 // ---------------------------------------------------------------------------
-${checklist.join('\n')}
+${checklist.join("\n")}
 `;
-}
+      }
 
-// ── Path helpers ───────────────────────────────────────────────────────────
-function guessPath(title, url) {
-  const seg = (url||'').split('/').filter(Boolean);
-  if (seg.length === 1) return `@/pages/${pascal(title)}Page`;
-  return `@/pages/tools/${seg[0]}/${pascal(title)}Page`;
-}
-function guessSubPath(url, title) {
-  const seg = (url||'').split('/').filter(Boolean);
-  const dir = seg.length > 1 ? seg.slice(0,-1).join('/') : 'tools';
-  return `@/pages/tools/${dir}/${pascal(title)}Page`;
-}
+      // ── Path helpers ───────────────────────────────────────────────────────────
+      function guessPath(title, url) {
+        const seg = (url || "").split("/").filter(Boolean);
+        if (seg.length === 1) return `@/pages/${pascal(title)}Page`;
+        return `@/pages/tools/${seg[0]}/${pascal(title)}Page`;
+      }
+      function guessSubPath(url, title) {
+        const seg = (url || "").split("/").filter(Boolean);
+        const dir = seg.length > 1 ? seg.slice(0, -1).join("/") : "tools";
+        return `@/pages/tools/${dir}/${pascal(title)}Page`;
+      }
 
-// ── Render output ──────────────────────────────────────────────────────────
-function renderOut() {
-  document.getElementById('out').innerHTML = hl(generateTS());
-}
+      // ── Render output ──────────────────────────────────────────────────────────
+      function renderOut() {
+        document.getElementById("out").innerHTML = hl(generateTS());
+      }
 
-function hl(code) {
-  return esc(code)
-    .replace(/\/\/.*$/gm, m => `<span class="cm">${m}</span>`)
-    .replace(/\b(import|export|from|const|let|type|interface|function|return|if|true|false|undefined)\b/g, m => `<span class="kw">${m}</span>`)
-    .replace(/&quot;([^&]*)&quot;/g, m => `<span class="str">${m}</span>`);
-}
+      function hl(code) {
+        return esc(code)
+          .replace(/\/\/.*$/gm, (m) => `<span class="cm">${m}</span>`)
+          .replace(
+            /\b(import|export|from|const|let|type|interface|function|return|if|true|false|undefined)\b/g,
+            (m) => `<span class="kw">${m}</span>`
+          )
+          .replace(
+            /&quot;([^&]*)&quot;/g,
+            (m) => `<span class="str">${m}</span>`
+          );
+      }
 
-function esc(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
+      function esc(s) {
+        return String(s)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      }
 
-function pascal(s) {
-  return s.replace(/[^a-zA-Z0-9]+(.)/g,(_,c)=>c.toUpperCase()).replace(/^./,c=>c.toUpperCase());
-}
+      function pascal(s) {
+        return s
+          .replace(/[^a-zA-Z0-9]+(.)/g, (_, c) => c.toUpperCase())
+          .replace(/^./, (c) => c.toUpperCase());
+      }
 
-function doCopy() {
-  navigator.clipboard.writeText(generateTS()).then(() => {
-    const t = document.getElementById('toast');
-    t.classList.add('show');
-    setTimeout(()=>t.classList.remove('show'),2000);
-  });
-}
-function doDownload() {
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([generateTS()],{type:'text/typescript'}));
-  a.download='tools.ts'; a.click();
-}
+      function doCopy() {
+        navigator.clipboard.writeText(generateTS()).then(() => {
+          const t = document.getElementById("toast");
+          t.classList.add("show");
+          setTimeout(() => t.classList.remove("show"), 2000);
+        });
+      }
+      function doDownload() {
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(
+          new Blob([generateTS()], { type: "text/typescript" })
+        );
+        a.download = "tools.ts";
+        a.click();
+      }
 
-render();
-</script>
-</body>
+      // ── Import modal ───────────────────────────────────────────────────────────
+      function openImport() {
+        const m = document.getElementById("importModal");
+        m.style.display = "flex";
+        document.getElementById("importText").value = "";
+        document.getElementById("importError").style.display = "none";
+        setTimeout(() => document.getElementById("importText").focus(), 50);
+      }
+      function closeImport() {
+        document.getElementById("importModal").style.display = "none";
+      }
+      function doImport() {
+        const src = document.getElementById("importText").value.trim();
+        if (!src) return showImportError("Please paste your tools.ts content.");
+        try {
+          const parsed = parseToolsTS(src);
+          if (!parsed.length)
+            return showImportError(
+              "Could not find any tools. Make sure you pasted the full tools.ts file."
+            );
+          tools = parsed;
+          openPanels.clear();
+          save();
+          render();
+          closeImport();
+        } catch (e) {
+          showImportError("Parse error: " + e.message);
+        }
+      }
+      function showImportError(msg) {
+        const el = document.getElementById("importError");
+        el.textContent = msg;
+        el.style.display = "block";
+      }
+
+      // ── tools.ts parser ────────────────────────────────────────────────────────
+      function parseToolsTS(src) {
+        const parsed = [];
+        const arrayMatch = src.match(
+          /export\s+const\s+toolsData[^=]*=\s*\[([\s\S]*?)\];\s*(?:\/\/|export|$)/
+        );
+        if (!arrayMatch)
+          throw new Error('Could not find "export const toolsData = [...]".');
+        const toolBlocks = splitTopLevelObjects(arrayMatch[1]);
+        for (const block of toolBlocks) {
+          const tool = parseObj(block);
+          if (!tool.title) continue;
+          const compMatch = block.match(/^\s+component:\s*(\w+),/m);
+          if (compMatch) tool.existingComponent = compMatch[1];
+          const subMatch = block.match(
+            /subtools:\s*\[([\s\S]*?)\]\s*,?\s*(?=\})/
+          );
+          if (subMatch) {
+            tool.subtools = splitTopLevelObjects(subMatch[1])
+              .map((sb) => {
+                const sub = parseObj(sb);
+                const sc = sb.match(/^\s+component:\s*(\w+),/m);
+                if (sc) sub.existingComponent = sc[1];
+                return sub;
+              })
+              .filter((s) => s.title);
+          } else {
+            tool.subtools = [];
+          }
+          parsed.push(tool);
+        }
+        return parsed;
+      }
+
+      function splitTopLevelObjects(src) {
+        const blocks = [];
+        let depth = 0,
+          start = -1;
+        for (let i = 0; i < src.length; i++) {
+          if (src[i] === "{") {
+            if (depth === 0) start = i;
+            depth++;
+          } else if (src[i] === "}") {
+            depth--;
+            if (depth === 0 && start !== -1) {
+              blocks.push(src.slice(start, i + 1));
+              start = -1;
+            }
+          }
+        }
+        return blocks;
+      }
+
+      function parseObj(block) {
+        const obj = { allowedRoles: [] };
+        const m = (re) => block.match(re);
+        const t = m(/title:\s*"([^"]+)"/);
+        if (t) obj.title = t[1];
+        const u = m(/url:\s*"([^"]*)"/);
+        if (u) obj.url = u[1];
+        const ic = m(/icon:\s*(\w+)/);
+        if (ic) obj.icon = ic[1];
+        const d = m(/description:\s*"([^"]+)"/);
+        if (d) obj.description = d[1];
+        const r = m(/allowedRoles:\s*\[([^\]]*)\]/);
+        if (r)
+          obj.allowedRoles = (r[1].match(/"([^"]+)"/g) || []).map((x) =>
+            x.replace(/"/g, "")
+          );
+        return obj;
+      }
+
+      render();
+    </script>
+  </body>
 </html>
