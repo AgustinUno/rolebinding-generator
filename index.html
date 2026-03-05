@@ -11,16 +11,14 @@
   --bg: #0d0d0f; --surface: #141416; --surface2: #18181c;
   --border: #222228; --border2: #2e2e38;
   --text: #e8e8ec; --muted: #52525e; --muted2: #7a7a8a;
-  --accent: #6c8eff; --accent-dim: #151d38; --accent-glow: rgba(108,142,255,0.15);
-  --green: #4ade80; --green-dim: #0c1f14;
-  --red: #f87171; --red-dim: #250d0d;
+  --accent: #6c8eff; --accent-dim: #151d38;
+  --green: #4ade80; --red: #f87171; --red-dim: #250d0d;
   --mono: 'JetBrains Mono', monospace;
   --sans: 'DM Sans', sans-serif;
   --r: 6px;
 }
 body { font-family: var(--sans); background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-/* Header */
 header {
   display: flex; align-items: center; justify-content: space-between;
   padding: 0 24px; height: 52px; flex-shrink: 0;
@@ -32,42 +30,35 @@ header {
 .pill { font-family: var(--mono); font-size: 10px; padding: 2px 7px; border-radius: 20px; background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(108,142,255,.25); }
 .header-hint { font-size: 11px; color: var(--muted); }
 
-/* Layout */
-.layout { display: grid; grid-template-columns: 480px 1fr; flex: 1; overflow: hidden; }
+.layout { display: grid; grid-template-columns: 500px 1fr; flex: 1; overflow: hidden; }
 
-/* Left panel */
 .left { display: flex; flex-direction: column; border-right: 1px solid var(--border); overflow: hidden; }
 .left-toolbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-bottom: 1px solid var(--border); flex-shrink: 0; background: var(--surface); }
 .left-body { flex: 1; overflow-y: auto; padding: 16px 20px; }
 
-/* Right panel */
 .right { display: flex; flex-direction: column; overflow: hidden; }
 .right-toolbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-bottom: 1px solid var(--border); flex-shrink: 0; background: var(--surface); }
 .right-body { flex: 1; overflow: auto; padding: 20px 24px; }
 
-/* Section label */
 .slabel { font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+.ptitle { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
 
-/* Input */
-input[type=text], select, textarea {
+input[type=text], select {
   width: 100%; background: var(--bg); border: 1px solid var(--border);
   border-radius: var(--r); padding: 7px 11px; font-family: var(--sans);
   font-size: 13px; color: var(--text); outline: none; transition: border-color .15s;
 }
-input[type=text]:focus, select:focus, textarea:focus { border-color: var(--accent); }
-input::placeholder, textarea::placeholder { color: var(--muted); }
+input[type=text]:focus, select:focus { border-color: var(--accent); }
+input::placeholder { color: var(--muted); }
 select option { background: #1a1a20; }
 
-/* Add form */
 .add-form {
   background: rgba(108,142,255,.04); border: 1px dashed rgba(108,142,255,.25);
   border-radius: var(--r); padding: 16px; margin-bottom: 14px;
 }
 .field { margin-bottom: 10px; }
-.field:last-child { margin-bottom: 0; }
 .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
 
-/* Role chips */
 .chips { display: flex; flex-wrap: wrap; gap: 5px; }
 .chip {
   font-size: 11px; padding: 3px 9px; border-radius: 20px;
@@ -77,7 +68,6 @@ select option { background: #1a1a20; }
 .chip:hover { border-color: var(--border2); }
 .chip.on { border-color: var(--accent); background: var(--accent-dim); color: var(--accent); }
 
-/* Buttons */
 .btn {
   display: inline-flex; align-items: center; gap: 5px;
   padding: 6px 13px; border-radius: var(--r); font-family: var(--sans);
@@ -94,47 +84,35 @@ select option { background: #1a1a20; }
 .btn-sm { padding: 4px 9px; font-size: 11px; }
 .row { display: flex; align-items: center; gap: 8px; }
 
-/* Tool cards */
 .tool-card { border: 1px solid var(--border); border-radius: var(--r); background: var(--surface); margin-bottom: 8px; overflow: hidden; }
 .tool-card:hover { border-color: var(--border2); }
 .card-header { display: flex; align-items: center; justify-content: space-between; padding: 9px 13px; cursor: pointer; }
-.card-left { display: flex; align-items: center; gap: 8px; min-width: 0; }
-.card-num { font-family: var(--mono); font-size: 10px; color: var(--muted); min-width: 18px; }
+.card-left { display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1; overflow: hidden; }
+.card-num { font-family: var(--mono); font-size: 10px; color: var(--muted); min-width: 18px; flex-shrink: 0; }
 .card-title { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.card-url { font-family: var(--mono); font-size: 11px; color: var(--muted); margin-left: 4px; white-space: nowrap; }
+.card-url { font-family: var(--mono); font-size: 11px; color: var(--muted); margin-left: 4px; white-space: nowrap; flex-shrink: 0; }
 .card-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
 .sub-badge { font-size: 10px; padding: 2px 6px; border-radius: 20px; background: var(--accent-dim); color: var(--accent); font-family: var(--mono); }
 
-/* Edit area */
 .edit-area { border-top: 1px solid var(--border); padding: 14px; background: rgba(0,0,0,.25); }
-.edit-field { margin-bottom: 10px; }
 
-/* Subtool rows */
 .subtool-block { background: rgba(0,0,0,.3); border: 1px solid var(--border); border-radius: var(--r); margin-top: 4px; }
-.subtool-item { padding: 10px 12px; border-bottom: 1px solid var(--border); }
+.subtool-item { padding: 12px; border-bottom: 1px solid var(--border); }
 .subtool-item:last-child { border-bottom: none; }
-.subtool-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
 .subtool-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-.subtool-name { font-size: 12px; font-weight: 500; color: var(--muted2); }
+.subtool-name-label { font-size: 11px; font-weight: 600; color: var(--muted2); font-family: var(--mono); }
 
-/* Code output */
-pre { font-family: var(--mono); font-size: 12px; line-height: 1.75; white-space: pre; color: #abb2bf; }
-.kw { color: #c678dd; } .str { color: #98c379; } .cm { color: #5c6370; font-style: italic; }
-.typ { color: #e5c07b; } .fn { color: #61afef; } .num { color: #d19a66; }
-
-/* Empty */
 .empty { text-align: center; padding: 32px; color: var(--muted); font-size: 13px; border: 1px dashed var(--border); border-radius: var(--r); }
 
-/* Toast */
+pre { font-family: var(--mono); font-size: 12px; line-height: 1.75; white-space: pre; color: #abb2bf; }
+.kw { color: #c678dd; } .str { color: #98c379; } .cm { color: #5c6370; font-style: italic; }
+
 .toast { position: fixed; bottom: 20px; right: 20px; background: var(--green); color: #0a0a0a; font-size: 12px; font-weight: 600; padding: 9px 16px; border-radius: var(--r); opacity: 0; transform: translateY(6px); transition: all .2s; pointer-events: none; z-index: 999; }
 .toast.show { opacity: 1; transform: translateY(0); }
 
-/* Scrollbar */
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
-
-.ptitle { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
 </style>
 </head>
 <body>
@@ -149,8 +127,6 @@ pre { font-family: var(--mono); font-size: 12px; line-height: 1.75; white-space:
 </header>
 
 <div class="layout">
-
-  <!-- LEFT: Editor -->
   <div class="left">
     <div class="left-toolbar">
       <span class="ptitle">Tools</span>
@@ -158,7 +134,6 @@ pre { font-family: var(--mono); font-size: 12px; line-height: 1.75; white-space:
     </div>
     <div class="left-body">
 
-      <!-- Add form -->
       <div id="addForm" style="display:none" class="add-form">
         <div class="field-row">
           <div class="field">
@@ -179,13 +154,6 @@ pre { font-family: var(--mono); font-size: 12px; line-height: 1.75; white-space:
             <div class="slabel">Icon (lucide name)</div>
             <input type="text" id="nIcon" placeholder="e.g. BarChart2" />
           </div>
-          <div class="field">
-            <div class="slabel">Type</div>
-            <select id="nType">
-              <option value="leaf">Leaf (single page)</option>
-              <option value="parent">Parent (has subtools)</option>
-            </select>
-          </div>
         </div>
         <div class="field">
           <div class="slabel">Allowed Roles</div>
@@ -197,12 +165,10 @@ pre { font-family: var(--mono); font-size: 12px; line-height: 1.75; white-space:
         </div>
       </div>
 
-      <!-- Tool list -->
       <div id="toolList"></div>
     </div>
   </div>
 
-  <!-- RIGHT: Output -->
   <div class="right">
     <div class="right-toolbar">
       <span class="ptitle">Generated tools.ts</span>
@@ -215,35 +181,77 @@ pre { font-family: var(--mono); font-size: 12px; line-height: 1.75; white-space:
       <pre id="out"></pre>
     </div>
   </div>
-
 </div>
+
 <div class="toast" id="toast">✓ Copied!</div>
 
 <script>
 const ROLES = ['superadmin','admin','guest','dev','operations','marketing','managers','documentations','it','others'];
 
+// ── Default tools matching actual tools.ts ─────────────────────────────────
 let tools = [
-  { title:'Home', url:'/home', icon:'Home', description:'Welcome dashboard and main landing page', allowedRoles:[], subtools:[] },
-  { title:'Dashboard', url:'/dashboard', icon:'LayoutDashboard', description:'View system stats and analytics', allowedRoles:['superadmin','admin'], subtools:[] },
-  { title:'User Management', url:'/users', icon:'User2Icon', description:'Manage users, roles, and permissions', allowedRoles:['superadmin','admin'], subtools:[] },
-  { title:'Inventory & Assets', url:'', icon:'CirclePile', description:'Track and manage inventory and assets', allowedRoles:['superadmin','admin','operations'], subtools:[
-    { title:'Asset List', url:'/inventory/assets', description:'View and edit all assets', allowedRoles:['superadmin','admin','operations'] },
-    { title:'Asset Reports', url:'/inventory/reports', description:'Generate inventory and asset reports', allowedRoles:['superadmin'] },
-  ]},
-  { title:'Operations', url:'', icon:'HardHat', description:'Manage daily operations workflow', allowedRoles:['superadmin','operations'], subtools:[
-    { title:'Task Board', url:'/operations/tasks', description:'View and manage tasks', allowedRoles:['superadmin','operations'] },
-    { title:'Shift Schedules', url:'/operations/shifts', description:'Manage employee shifts', allowedRoles:['superadmin'] },
-  ]},
-  { title:'Finance', url:'', icon:'BadgeDollarSign', description:'Financial management tools and reports', allowedRoles:['superadmin','managers'], subtools:[
-    { title:'Expense Tracker', url:'/finance/expenses', description:'Track company expenses', allowedRoles:['superadmin','managers'] },
-    { title:'Budget Planner', url:'/finance/budget', description:'Plan and monitor budgets', allowedRoles:['superadmin','managers'] },
-  ]},
-  { title:'Marketing', url:'', icon:'HandshakeIcon', description:'CRM and marketing tools', allowedRoles:['superadmin','marketing'], subtools:[
-    { title:'Campaigns', url:'/marketing/campaigns', description:'Manage marketing campaigns', allowedRoles:['superadmin','marketing'] },
-    { title:'Leads', url:'/marketing/leads', description:'View and manage leads', allowedRoles:['superadmin','marketing'] },
-  ]},
-  { title:'AI Assistant', url:'/ai-assistant', icon:'BotIcon', description:'AI-powered workflow assistant', allowedRoles:['superadmin','admin'], subtools:[] },
+  {
+    title:'Home', url:'/home', icon:'Home',
+    description:'Welcome dashboard and main landing page',
+    allowedRoles:[], subtools:[]
+  },
+  {
+    title:'Dashboard', url:'/dashboard', icon:'LayoutDashboard',
+    description:'View system stats and analytics',
+    allowedRoles:['superadmin','admin'], subtools:[],
+    existingComponent:'Dashboard'  // already built
+  },
+  {
+    title:'User Management', url:'/users', icon:'User2Icon',
+    description:'Manage users, roles, and permissions',
+    allowedRoles:['superadmin','admin'], subtools:[],
+    existingComponent:'UserManagementPage'
+  },
+  {
+    title:'Inventory & Assets', url:'', icon:'CirclePile',
+    description:'Track and manage inventory and assets',
+    allowedRoles:['superadmin','admin','operations'],
+    subtools:[
+      { title:'Asset List', url:'/inventory/assets', description:'View and edit all assets', allowedRoles:['superadmin','admin','operations'], existingComponent:'AssetListPage' },
+      { title:'Asset Reports', url:'/inventory/reports', description:'Generate inventory and asset reports', allowedRoles:['superadmin'] },
+    ]
+  },
+  {
+    title:'Operations', url:'', icon:'HardHat',
+    description:'Manage daily operations workflow',
+    allowedRoles:['superadmin','operations'],
+    subtools:[
+      { title:'Task Board', url:'/operations/tasks', description:'View and manage tasks', allowedRoles:['superadmin','operations'] },
+      { title:'Shift Schedules', url:'/operations/shifts', description:'Manage employee shifts', allowedRoles:['superadmin'] },
+    ]
+  },
+  {
+    title:'Finance', url:'', icon:'BadgeDollarSign',
+    description:'Financial management tools and reports',
+    allowedRoles:['superadmin','managers'],
+    subtools:[
+      { title:'Expense Tracker', url:'/finance/expenses', description:'Track company expenses', allowedRoles:['superadmin','managers'] },
+      { title:'Budget Planner', url:'/finance/budget', description:'Plan and monitor budgets', allowedRoles:['superadmin','managers'] },
+    ]
+  },
+  {
+    title:'Marketing', url:'', icon:'HandshakeIcon',
+    description:'CRM and marketing tools',
+    allowedRoles:['superadmin','marketing'],
+    subtools:[
+      { title:'Campaigns', url:'/marketing/campaigns', description:'Manage marketing campaigns', allowedRoles:['superadmin','marketing'] },
+      { title:'Leads', url:'/marketing/leads', description:'View and manage leads', allowedRoles:['superadmin','marketing'] },
+    ]
+  },
+  {
+    title:'AI Assistant', url:'/ai-assistant', icon:'BotIcon',
+    description:'AI-powered workflow assistant',
+    allowedRoles:['superadmin','admin'], subtools:[]
+  },
 ];
+
+// Track which edit panels are open so re-render keeps them open
+const openPanels = new Set();
 
 // ── Render editor ──────────────────────────────────────────────────────────
 function render() {
@@ -259,81 +267,99 @@ function render() {
           <span class="card-url">${t.url ? esc(t.url) : ''}</span>
         </div>
         <div class="card-right">
-          ${t.subtools.length ? `<span class="sub-badge">${t.subtools.length} sub</span>` : ''}
+          ${t.subtools && t.subtools.length ? `<span class="sub-badge">${t.subtools.length} sub</span>` : ''}
+          ${t.existingComponent ? `<span class="sub-badge" style="background:var(--green);color:#0a0a0a;opacity:.8">built</span>` : ''}
           <button class="btn btn-red btn-sm" onclick="event.stopPropagation();removeTool(${i})">✕</button>
         </div>
       </div>
-      <div id="ea-${i}" style="display:none">
+      <div id="ea-${i}" style="display:${openPanels.has(i)?'block':'none'}">
         <div class="edit-area">
 
-          <div class="field-row" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+          <div class="field-row" style="margin-bottom:10px">
             <div>
               <div class="slabel">Title</div>
-              <input type="text" value="${esc(t.title)}" oninput="tools[${i}].title=this.value;renderOut()" />
+              <input type="text" value="${esc(t.title)}"
+                oninput="tools[${i}].title=this.value;renderOut()" />
             </div>
             <div>
               <div class="slabel">URL</div>
-              <input type="text" value="${esc(t.url)}" oninput="tools[${i}].url=this.value;renderOut()" placeholder="/path or blank if parent" />
+              <input type="text" value="${esc(t.url||'')}"
+                oninput="tools[${i}].url=this.value;renderOut()"
+                placeholder="/path or blank if parent" />
             </div>
           </div>
 
           <div style="margin-bottom:10px">
             <div class="slabel">Description</div>
-            <input type="text" value="${esc(t.description||'')}" oninput="tools[${i}].description=this.value;renderOut()" placeholder="Short description" />
+            <input type="text" value="${esc(t.description||'')}"
+              oninput="tools[${i}].description=this.value;renderOut()"
+              placeholder="Short description" />
           </div>
 
-          <div style="margin-bottom:10px">
+          <div style="margin-bottom:12px">
             <div class="slabel">Icon (lucide name)</div>
-            <input type="text" value="${esc(t.icon||'')}" oninput="tools[${i}].icon=this.value;renderOut()" placeholder="e.g. BarChart2" />
+            <input type="text" value="${esc(t.icon||'')}"
+              oninput="tools[${i}].icon=this.value;renderOut()"
+              placeholder="e.g. BarChart2" />
           </div>
 
-          <div style="margin-bottom:14px">
+          <div style="margin-bottom:16px">
             <div class="slabel">Allowed Roles</div>
-            <div class="chips">
-              ${ROLES.map(r => `<span class="chip ${t.allowedRoles.includes(r)?'on':''}" onclick="togRole(${i},-1,'${r}')">${r}</span>`).join('')}
+            <div class="chips" id="roles-${i}">
+              ${ROLES.map(r => `
+                <span class="chip ${(t.allowedRoles||[]).includes(r)?'on':''}"
+                  onclick="togRole(${i},-1,'${r}')">${r}</span>
+              `).join('')}
             </div>
           </div>
 
-          <!-- Subtools -->
           <div>
             <div class="row" style="margin-bottom:8px">
               <span class="slabel" style="margin-bottom:0">Subtools</span>
               <button class="btn btn-ghost btn-sm" onclick="addSub(${i})">+ Add Subtool</button>
             </div>
-            ${t.subtools.length ? `
+            ${t.subtools && t.subtools.length ? `
               <div class="subtool-block">
-                ${t.subtools.map((s, j) => `
+                ${t.subtools.map((s,j) => `
                   <div class="subtool-item">
                     <div class="subtool-header">
-                      <span class="subtool-name">${esc(s.title) || 'Untitled'}</span>
+                      <span class="subtool-name-label">${esc(s.title)||'untitled'}${s.existingComponent ? ' <span style="color:var(--green);font-size:10px">✓ built</span>' : ''}</span>
                       <button class="btn btn-red btn-sm" onclick="removeSub(${i},${j})">✕</button>
                     </div>
-                    <div class="subtool-fields">
+                    <div class="field-row" style="margin-bottom:8px">
                       <div>
                         <div class="slabel">Title</div>
-                        <input type="text" value="${esc(s.title)}" oninput="tools[${i}].subtools[${j}].title=this.value;render()" placeholder="Subtool title" />
+                        <input type="text" value="${esc(s.title)}"
+                          oninput="tools[${i}].subtools[${j}].title=this.value;renderSubLabel(${i},${j});renderOut()"
+                          placeholder="Subtool title" />
                       </div>
                       <div>
                         <div class="slabel">URL</div>
-                        <input type="text" value="${esc(s.url)}" oninput="tools[${i}].subtools[${j}].url=this.value;renderOut()" placeholder="/module/path" />
+                        <input type="text" value="${esc(s.url)}"
+                          oninput="tools[${i}].subtools[${j}].url=this.value;renderOut()"
+                          placeholder="/module/path" />
                       </div>
                     </div>
                     <div style="margin-bottom:8px">
                       <div class="slabel">Description</div>
-                      <input type="text" value="${esc(s.description||'')}" oninput="tools[${i}].subtools[${j}].description=this.value;renderOut()" placeholder="Description" />
+                      <input type="text" value="${esc(s.description||'')}"
+                        oninput="tools[${i}].subtools[${j}].description=this.value;renderOut()"
+                        placeholder="Description" />
                     </div>
                     <div>
                       <div class="slabel">Allowed Roles</div>
-                      <div class="chips">
-                        ${ROLES.map(r => `<span class="chip ${s.allowedRoles.includes(r)?'on':''}" onclick="togRole(${i},${j},'${r}')">${r}</span>`).join('')}
+                      <div class="chips" id="sroles-${i}-${j}">
+                        ${ROLES.map(r => `
+                          <span class="chip ${(s.allowedRoles||[]).includes(r)?'on':''}"
+                            onclick="togRole(${i},${j},'${r}')">${r}</span>
+                        `).join('')}
                       </div>
                     </div>
                   </div>
                 `).join('')}
               </div>
-            ` : `<div style="color:var(--muted);font-size:12px;padding:6px 0">No subtools yet.</div>`}
+            ` : `<div style="color:var(--muted);font-size:12px;padding:4px 0">No subtools.</div>`}
           </div>
-
         </div>
       </div>
     </div>
@@ -341,20 +367,50 @@ function render() {
   renderOut();
 }
 
+// ── Toggle edit — tracks open state so re-render doesn't collapse ──────────
 function toggleEdit(i) {
+  if (openPanels.has(i)) openPanels.delete(i);
+  else openPanels.add(i);
   const el = document.getElementById(`ea-${i}`);
-  el.style.display = el.style.display === 'none' ? 'block' : 'none';
+  if (el) el.style.display = openPanels.has(i) ? 'block' : 'none';
 }
 
+// ── Role toggle — does NOT re-render the full list, just toggles the chip ──
 function togRole(ti, si, role) {
   const arr = si === -1 ? tools[ti].allowedRoles : tools[ti].subtools[si].allowedRoles;
   const idx = arr.indexOf(role);
-  if (idx > -1) arr.splice(idx, 1); else arr.push(role);
+  if (idx > -1) arr.splice(idx,1); else arr.push(role);
+
+  // Only update the chips container, not the whole list
+  const containerId = si === -1 ? `roles-${ti}` : `sroles-${ti}-${si}`;
+  const container = document.getElementById(containerId);
+  if (container) {
+    container.querySelectorAll('.chip').forEach(chip => {
+      chip.classList.toggle('on', arr.includes(chip.textContent.trim()));
+    });
+  }
+  renderOut();
+}
+
+// Update subtool label in header without full re-render
+function renderSubLabel(ti, ji) {
+  renderOut();
+}
+
+function removeTool(i) {
+  openPanels.delete(i);
+  // Shift open panel indices
+  const newOpen = new Set();
+  openPanels.forEach(idx => { if (idx < i) newOpen.add(idx); else if (idx > i) newOpen.add(idx-1); });
+  openPanels.clear(); newOpen.forEach(v => openPanels.add(v));
+  tools.splice(i,1); render();
+}
+
+function addSub(i) {
+  tools[i].subtools.push({title:'New Subtool',url:'',description:'',allowedRoles:[]});
   render();
 }
 
-function removeTool(i) { tools.splice(i,1); render(); }
-function addSub(i) { tools[i].subtools.push({title:'New Subtool',url:'',description:'',allowedRoles:[]}); render(); }
 function removeSub(ti,si) { tools[ti].subtools.splice(si,1); render(); }
 
 // ── Add form ───────────────────────────────────────────────────────────────
@@ -381,9 +437,9 @@ function commitAdd() {
     title, url: document.getElementById('nUrl').value.trim(),
     icon: document.getElementById('nIcon').value.trim(),
     description: document.getElementById('nDesc').value.trim(),
-    allowedRoles: [...nRoles], subtools: []
+    allowedRoles: [...nRoles], subtools:[]
   });
-  ['nTitle','nUrl','nIcon','nDesc'].forEach(id => document.getElementById(id).value = '');
+  ['nTitle','nUrl','nIcon','nDesc'].forEach(id => document.getElementById(id).value='');
   toggleAdd(); render();
 }
 
@@ -391,22 +447,25 @@ function commitAdd() {
 function generateTS() {
   const icons = [...new Set(tools.filter(t=>t.icon).map(t=>t.icon))];
 
-  // Build lazy import comments
-  const lazyParts = [];
+  // Lazy imports — already-built ones as active, others as comments
+  const lazyLines = [];
   tools.forEach(t => {
     if (!t.url || t.title === 'Home') return;
-    lazyParts.push(`// const ${pascal(t.title)} = lazy(() => import("@/pages/${pascal(t.title)}Page"));`);
+    const name = t.existingComponent || pascal(t.title);
+    const path = guessPath(t.title, t.url);
+    if (t.existingComponent) lazyLines.push(`const ${name} = lazy(() => import("${path}"));`);
+    else lazyLines.push(`// const ${name} = lazy(() => import("${path}"));`);
   });
   tools.forEach(t => {
     (t.subtools||[]).forEach(s => {
-      const seg = s.url.split('/').filter(Boolean);
-      const dir = seg.length > 1 ? seg.slice(0,-1).join('/') : '';
-      const path = dir ? `@/pages/tools/${dir}/${pascal(s.title)}Page` : `@/pages/tools/${pascal(s.title)}Page`;
-      lazyParts.push(`// const ${pascal(s.title)} = lazy(() => import("${path}"));`);
+      const name = s.existingComponent || pascal(s.title);
+      const path = guessSubPath(s.url, s.title);
+      if (s.existingComponent) lazyLines.push(`const ${name} = lazy(() => import("${path}"));`);
+      else lazyLines.push(`// const ${name} = lazy(() => import("${path}"));`);
     });
   });
 
-  // Build toolsData string
+  // toolsData
   const toolsStr = tools.map(t => {
     const lines = ['  {'];
     lines.push(`    title: "${t.title}",`);
@@ -414,16 +473,22 @@ function generateTS() {
     if (t.icon) lines.push(`    icon: ${t.icon},`);
     if (t.description) lines.push(`    description: "${t.description}",`);
     if (t.allowedRoles?.length) lines.push(`    allowedRoles: [${t.allowedRoles.map(r=>`"${r}"`).join(', ')}],`);
-    if (t.url && t.title !== 'Home') lines.push(`    // component: ${pascal(t.title)},`);
+    if (t.url && t.title !== 'Home') {
+      const name = t.existingComponent || pascal(t.title);
+      if (t.existingComponent) lines.push(`    component: ${name},`);
+      else lines.push(`    // component: ${name},`);
+    }
     if (t.subtools?.length) {
       lines.push('    subtools: [');
       t.subtools.forEach(s => {
+        const sname = s.existingComponent || pascal(s.title);
         lines.push('      {');
         lines.push(`        title: "${s.title}",`);
         lines.push(`        url: "${s.url}",`);
         if (s.description) lines.push(`        description: "${s.description}",`);
         if (s.allowedRoles?.length) lines.push(`        allowedRoles: [${s.allowedRoles.map(r=>`"${r}"`).join(', ')}],`);
-        lines.push(`        // component: ${pascal(s.title)},`);
+        if (s.existingComponent) lines.push(`        component: ${sname},`);
+        else lines.push(`        // component: ${sname},`);
         lines.push('      },');
       });
       lines.push('    ],');
@@ -432,27 +497,25 @@ function generateTS() {
     return lines.join('\n');
   }).join('\n');
 
-  // Build component checklist
-  const checklistItems = [];
+  // Checklist
+  const checklist = [];
   tools.forEach(t => {
     if (!t.url || t.title === 'Home') return;
-    const seg = t.url.split('/').filter(Boolean);
-    const path = seg.length > 1
-      ? `src/pages/tools/${seg.slice(0,-1).join('/')}/${pascal(t.title)}Page.tsx`
-      : `src/pages/${pascal(t.title)}Page.tsx`;
-    checklistItems.push(`//   [ ] ${pascal(t.title)}Page  →  ${path}`);
+    const done = !!t.existingComponent;
+    const path = guessPath(t.title, t.url);
+    checklist.push(`//   [${done?'x':' '}] ${pascal(t.title)}Page  →  ${path}.tsx`);
   });
   tools.forEach(t => {
     (t.subtools||[]).forEach(s => {
-      const seg = s.url.split('/').filter(Boolean);
-      const dir = seg.length > 1 ? seg.slice(0,-1).join('/') : 'tools';
-      checklistItems.push(`//   [ ] ${pascal(s.title)}Page  →  src/pages/tools/${dir}/${pascal(s.title)}Page.tsx`);
+      const done = !!s.existingComponent;
+      const path = guessSubPath(s.url, s.title);
+      checklist.push(`//   [${done?'x':' '}] ${pascal(s.title)}Page  →  ${path}.tsx`);
     });
   });
 
   return `import type { ElementType, ComponentType } from "react";
 import {
-${icons.map(ic => `  ${ic},`).join('\n')}
+${icons.map(ic=>`  ${ic},`).join('\n')}
 } from "lucide-react";
 import { lazy } from "react";
 import type { UserRole } from "./schema";
@@ -476,9 +539,13 @@ export interface Tool {
 }
 
 // ---------------------------------------------------------------------------
-// Lazy imports — uncomment when component is ready, then set component: X
+// To connect a real page:
+//   1. Build your component e.g. src/pages/tools/inventory/AssetListPage.tsx
+//   2. Uncomment the lazy import below
+//   3. Set component: ComponentName on the matching tool/subtool entry
+//   4. Done — route, sidebar, home card, command menu all just work
 // ---------------------------------------------------------------------------
-${lazyParts.join('\n')}
+${lazyLines.join('\n')}
 
 export const toolsData: Tool[] = [
 ${toolsStr}
@@ -499,8 +566,20 @@ export function hasAccess(
 // ---------------------------------------------------------------------------
 // Components to create — check off as you build each page
 // ---------------------------------------------------------------------------
-${checklistItems.join('\n')}
+${checklist.join('\n')}
 `;
+}
+
+// ── Path helpers ───────────────────────────────────────────────────────────
+function guessPath(title, url) {
+  const seg = (url||'').split('/').filter(Boolean);
+  if (seg.length === 1) return `@/pages/${pascal(title)}Page`;
+  return `@/pages/tools/${seg[0]}/${pascal(title)}Page`;
+}
+function guessSubPath(url, title) {
+  const seg = (url||'').split('/').filter(Boolean);
+  const dir = seg.length > 1 ? seg.slice(0,-1).join('/') : 'tools';
+  return `@/pages/tools/${dir}/${pascal(title)}Page`;
 }
 
 // ── Render output ──────────────────────────────────────────────────────────
@@ -520,21 +599,20 @@ function esc(s) {
 }
 
 function pascal(s) {
-  return s.replace(/[^a-zA-Z0-9]+(.)/g, (_,c) => c.toUpperCase()).replace(/^./,c=>c.toUpperCase());
+  return s.replace(/[^a-zA-Z0-9]+(.)/g,(_,c)=>c.toUpperCase()).replace(/^./,c=>c.toUpperCase());
 }
 
 function doCopy() {
   navigator.clipboard.writeText(generateTS()).then(() => {
     const t = document.getElementById('toast');
     t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2000);
+    setTimeout(()=>t.classList.remove('show'),2000);
   });
 }
-
 function doDownload() {
   const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([generateTS()], {type:'text/typescript'}));
-  a.download = 'tools.ts'; a.click();
+  a.href = URL.createObjectURL(new Blob([generateTS()],{type:'text/typescript'}));
+  a.download='tools.ts'; a.click();
 }
 
 render();
