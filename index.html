@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ENIC · tools.ts Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0d0d0f;
+    --surface: #141416;
+    --border: #1e1e22;
+    --border-hover: #2e2e34;
+    --text: #e8e8ec;
+    --muted: #5a5a6a;
+    --accent: #6c8eff;
+    --accent-dim: #1a2140;
+    --green: #4ade80;
+    --green-dim: #0d2018;
+    --red: #f87171;
+    --red-dim: #2a0f0f;
+    --amber: #fbbf24;
+    --amber-dim: #2a1f08;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
+    --radius: 8px;
+  }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Header ── */
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--surface);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 0.02em;
+  }
+  .logo-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+  .badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 100px;
+    background: var(--accent-dim);
+    color: var(--accent);
+    border: 1px solid rgba(108,142,255,0.2);
+  }
+
+  /* ── Layout ── */
+  .container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    flex: 1;
+    min-height: 0;
+  }
+
+  /* ── Panel ── */
+  .panel {
+    padding: 28px 32px;
+    overflow-y: auto;
+    border-right: 1px solid var(--border);
+  }
+  .panel:last-child { border-right: none; }
+
+  .panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+  .panel-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* ── Sections ── */
+  .section {
+    margin-bottom: 32px;
+  }
+  .section-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  /* ── Inputs ── */
+  input[type="text"], select {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 8px 12px;
+    font-family: var(--sans);
+    font-size: 13px;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  input[type="text"]:focus, select:focus {
+    border-color: var(--accent);
+  }
+  input[type="text"]::placeholder { color: var(--muted); }
+  select option { background: #1a1a1e; }
+
+  /* ── Role Checkboxes ── */
+  .roles-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .role-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 100px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .role-chip input { display: none; }
+  .role-chip:hover { border-color: var(--border-hover); }
+  .role-chip.active {
+    border-color: var(--accent);
+    background: var(--accent-dim);
+    color: var(--accent);
+  }
+
+  /* ── Tool Cards ── */
+  .tools-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .tool-card {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    overflow: hidden;
+    transition: border-color 0.15s;
+  }
+  .tool-card:hover { border-color: var(--border-hover); }
+  .tool-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    cursor: pointer;
+  }
+  .tool-card-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .tool-index {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    width: 18px;
+  }
+  .tool-name {
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .tool-url {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    margin-left: 4px;
+  }
+  .tool-card-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .subtool-count {
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 100px;
+    background: var(--accent-dim);
+    color: var(--accent);
+    font-family: var(--mono);
+  }
+
+  /* ── Subtools ── */
+  .subtools-area {
+    border-top: 1px solid var(--border);
+    padding: 10px 14px 14px;
+    background: rgba(0,0,0,0.2);
+  }
+  .subtool-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .subtool-row:last-child { border-bottom: none; }
+  .subtool-row input[type="text"] {
+    flex: 1;
+    padding: 5px 10px;
+    font-size: 12px;
+  }
+  .subtool-role-mini {
+    display: flex;
+    gap: 4px;
+  }
+  .mini-chip {
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 100px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    cursor: pointer;
+    transition: all 0.12s;
+    user-select: none;
+    white-space: nowrap;
+  }
+  .mini-chip.active {
+    border-color: var(--accent);
+    background: var(--accent-dim);
+    color: var(--accent);
+  }
+
+  /* ── Buttons ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border-radius: var(--radius);
+    font-family: var(--sans);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.15s;
+  }
+  .btn-ghost {
+    background: transparent;
+    border-color: var(--border);
+    color: var(--muted);
+  }
+  .btn-ghost:hover { border-color: var(--border-hover); color: var(--text); }
+  .btn-accent {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .btn-accent:hover { opacity: 0.85; }
+  .btn-danger {
+    background: transparent;
+    border-color: transparent;
+    color: var(--red);
+    padding: 4px 8px;
+  }
+  .btn-danger:hover { background: var(--red-dim); }
+  .btn-sm { padding: 4px 10px; font-size: 11px; }
+  .btn-green {
+    background: var(--green);
+    color: #0d0d0f;
+    border-color: var(--green);
+    font-weight: 600;
+  }
+  .btn-green:hover { opacity: 0.85; }
+
+  /* ── Output Panel ── */
+  .output-area {
+    position: relative;
+    height: calc(100vh - 65px);
+    display: flex;
+    flex-direction: column;
+  }
+  .output-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    flex-shrink: 0;
+  }
+  .output-code {
+    flex: 1;
+    overflow: auto;
+    padding: 20px;
+  }
+  pre {
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1.7;
+    white-space: pre;
+    color: #c9d1d9;
+  }
+
+  /* ── Syntax Highlight Colors ── */
+  .kw   { color: #ff79c6; }
+  .str  { color: #f1fa8c; }
+  .fn   { color: #8be9fd; }
+  .cm   { color: #6272a4; }
+  .num  { color: #bd93f9; }
+  .prop { color: #50fa7b; }
+  .typ  { color: #ffb86c; }
+
+  /* ── Copy toast ── */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--green);
+    color: #0d0d0f;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 10px 18px;
+    border-radius: var(--radius);
+    opacity: 0;
+    transform: translateY(8px);
+    transition: all 0.2s;
+    pointer-events: none;
+    z-index: 999;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  /* ── Add tool form ── */
+  .add-form {
+    border: 1px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 12px;
+    background: rgba(108,142,255,0.03);
+  }
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .form-row.single { grid-template-columns: 1fr; }
+
+  /* ── Empty state ── */
+  .empty {
+    text-align: center;
+    padding: 40px;
+    color: var(--muted);
+    font-size: 13px;
+    border: 1px dashed var(--border);
+    border-radius: var(--radius);
+  }
+
+  /* ── Scrollbar ── */
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  .divider { height: 1px; background: var(--border); margin: 20px 0; }
+  .row { display: flex; gap: 8px; align-items: center; }
+  .flex1 { flex: 1; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-dot"></div>
+    ENIC MIS
+    <span class="badge">tools.ts generator</span>
+  </div>
+  <div class="row">
+    <span style="font-size:12px;color:var(--muted);">Edit tools on the left — output updates live</span>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- ── LEFT: Editor ── -->
+  <div class="panel" id="editorPanel">
+
+    <!-- Add Tool Form -->
+    <div class="section">
+      <div class="panel-header">
+        <span class="panel-title">Tools</span>
+        <button class="btn btn-accent btn-sm" onclick="toggleAddForm()">+ Add Tool</button>
+      </div>
+
+      <div class="add-form" id="addForm" style="display:none">
+        <div class="form-row">
+          <div>
+            <div class="section-label">Title</div>
+            <input type="text" id="newTitle" placeholder="e.g. Reports" />
+          </div>
+          <div>
+            <div class="section-label">URL <span style="color:var(--muted);font-size:10px">(leave blank if has subtools)</span></div>
+            <input type="text" id="newUrl" placeholder="/reports" />
+          </div>
+        </div>
+        <div class="form-row single">
+          <div>
+            <div class="section-label">Description</div>
+            <input type="text" id="newDesc" placeholder="Short description of this tool" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div>
+            <div class="section-label">Icon (lucide name)</div>
+            <input type="text" id="newIcon" placeholder="e.g. BarChart2" />
+          </div>
+          <div>
+            <div class="section-label">Type</div>
+            <select id="newType">
+              <option value="leaf">Leaf (single page)</option>
+              <option value="parent">Parent (has subtools)</option>
+            </select>
+          </div>
+        </div>
+        <div style="margin-bottom:12px">
+          <div class="section-label">Allowed Roles</div>
+          <div class="roles-grid" id="newRolesGrid"></div>
+        </div>
+        <div class="row">
+          <button class="btn btn-ghost btn-sm" onclick="toggleAddForm()">Cancel</button>
+          <button class="btn btn-accent btn-sm" onclick="addTool()">Add Tool</button>
+        </div>
+      </div>
+
+      <!-- Tools List -->
+      <div class="tools-list" id="toolsList">
+        <div class="empty">No tools yet. Click "Add Tool" to get started.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── RIGHT: Output ── -->
+  <div class="output-area">
+    <div class="output-toolbar">
+      <span class="panel-title">Generated tools.ts</span>
+      <div class="row">
+        <button class="btn btn-ghost btn-sm" onclick="copyOutput()">Copy</button>
+        <button class="btn btn-green btn-sm" onclick="downloadOutput()">↓ Download</button>
+      </div>
+    </div>
+    <div class="output-code">
+      <pre id="outputCode"></pre>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast">✓ Copied to clipboard</div>
+
+<script>
+// ── State ──────────────────────────────────────────────────────────────────
+const ROLES = ['superadmin','admin','guest','dev','operations','marketing','managers','documentations','it','others'];
+
+const ICONS = [
+  'Home','LayoutDashboard','User2','CirclePile','HardHat','BadgeDollarSign',
+  'HandshakeIcon','BotIcon','BarChart2','FileText','Settings','Shield',
+  'Package','Truck','Calendar','Bell','Globe','Database','Code','Layers'
+];
+
+let tools = [
+  {
+    title: 'Home', url: '/home', icon: 'Home',
+    description: 'Welcome dashboard and main landing page',
+    allowedRoles: [], subtools: []
+  },
+  {
+    title: 'Dashboard', url: '/dashboard', icon: 'LayoutDashboard',
+    description: 'View system stats and analytics',
+    allowedRoles: ['superadmin','admin'], subtools: []
+  },
+  {
+    title: 'User Management', url: '/users', icon: 'User2Icon',
+    description: 'Manage users, roles, and permissions',
+    allowedRoles: ['superadmin','admin'], subtools: []
+  },
+  {
+    title: 'Inventory & Assets', url: '', icon: 'CirclePile',
+    description: 'Track and manage inventory and assets',
+    allowedRoles: ['superadmin','admin','operations'],
+    subtools: [
+      { title:'Asset List', url:'/inventory/assets', description:'View and edit all assets', allowedRoles:['superadmin','admin','operations'] },
+      { title:'Asset Reports', url:'/inventory/reports', description:'Generate inventory and asset reports', allowedRoles:['superadmin'] }
+    ]
+  },
+  {
+    title: 'Operations', url: '', icon: 'HardHat',
+    description: 'Manage daily operations workflow',
+    allowedRoles: ['superadmin','operations'],
+    subtools: [
+      { title:'Task Board', url:'/operations/tasks', description:'View and manage tasks', allowedRoles:['superadmin','operations'] },
+      { title:'Shift Schedules', url:'/operations/shifts', description:'Manage employee shifts', allowedRoles:['superadmin'] }
+    ]
+  },
+  {
+    title: 'Finance', url: '', icon: 'BadgeDollarSign',
+    description: 'Financial management tools and reports',
+    allowedRoles: ['superadmin','managers'],
+    subtools: [
+      { title:'Expense Tracker', url:'/finance/expenses', description:'Track company expenses', allowedRoles:['superadmin','managers'] },
+      { title:'Budget Planner', url:'/finance/budget', description:'Plan and monitor budgets', allowedRoles:['superadmin','managers'] }
+    ]
+  },
+  {
+    title: 'Marketing', url: '', icon: 'HandshakeIcon',
+    description: 'CRM and marketing tools',
+    allowedRoles: ['superadmin','marketing'],
+    subtools: [
+      { title:'Campaigns', url:'/marketing/campaigns', description:'Manage marketing campaigns', allowedRoles:['superadmin','marketing'] },
+      { title:'Leads', url:'/marketing/leads', description:'View and manage leads', allowedRoles:['superadmin','marketing'] }
+    ]
+  },
+  {
+    title: 'AI Assistant', url: '/ai-assistant', icon: 'BotIcon',
+    description: 'AI-powered workflow assistant',
+    allowedRoles: ['superadmin','admin'], subtools: []
+  }
+];
+
+// ── Render Editor ──────────────────────────────────────────────────────────
+function renderEditor() {
+  const list = document.getElementById('toolsList');
+  if (tools.length === 0) {
+    list.innerHTML = '<div class="empty">No tools yet. Click "Add Tool" to get started.</div>';
+    return;
+  }
+  list.innerHTML = tools.map((tool, i) => `
+    <div class="tool-card">
+      <div class="tool-card-header">
+        <div class="tool-card-left">
+          <span class="tool-index">${String(i+1).padStart(2,'0')}</span>
+          <span class="tool-name">${escHtml(tool.title)}</span>
+          <span class="tool-url">${tool.url ? escHtml(tool.url) : ''}</span>
+        </div>
+        <div class="tool-card-actions">
+          ${tool.subtools.length > 0 ? `<span class="subtool-count">${tool.subtools.length} subtools</span>` : ''}
+          <button class="btn btn-ghost btn-sm" onclick="toggleEdit(${i})" style="font-size:11px">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="removeTool(${i})">✕</button>
+        </div>
+      </div>
+      <div id="editArea-${i}" style="display:none; border-top:1px solid var(--border); padding:14px; background:rgba(0,0,0,0.15);">
+        <div class="form-row">
+          <div>
+            <div class="section-label">Title</div>
+            <input type="text" value="${escHtml(tool.title)}" oninput="tools[${i}].title=this.value;renderOutput()" />
+          </div>
+          <div>
+            <div class="section-label">URL</div>
+            <input type="text" value="${escHtml(tool.url)}" oninput="tools[${i}].url=this.value;renderOutput()" placeholder="/path or empty if parent" />
+          </div>
+        </div>
+        <div class="form-row single" style="margin-bottom:10px">
+          <div>
+            <div class="section-label">Description</div>
+            <input type="text" value="${escHtml(tool.description)}" oninput="tools[${i}].description=this.value;renderOutput()" />
+          </div>
+        </div>
+        <div class="form-row single" style="margin-bottom:10px">
+          <div>
+            <div class="section-label">Icon</div>
+            <input type="text" value="${escHtml(tool.icon||'')}" oninput="tools[${i}].icon=this.value;renderOutput()" placeholder="Lucide icon name" />
+          </div>
+        </div>
+        <div style="margin-bottom:12px">
+          <div class="section-label">Allowed Roles</div>
+          <div class="roles-grid">
+            ${ROLES.map(r => `
+              <label class="role-chip ${tool.allowedRoles.includes(r)?'active':''}">
+                <input type="checkbox" ${tool.allowedRoles.includes(r)?'checked':''} onchange="toggleRole(${i},-1,'${r}',this.checked)" />
+                ${r}
+              </label>
+            `).join('')}
+          </div>
+        </div>
+
+        ${tool.subtools.length > 0 || tool.url === '' ? `
+        <div>
+          <div class="section-label" style="margin-bottom:8px">Subtools
+            <button class="btn btn-ghost btn-sm" style="margin-left:8px" onclick="addSubtool(${i})">+ Add</button>
+          </div>
+          ${tool.subtools.map((sub, j) => `
+            <div class="subtool-row">
+              <input type="text" value="${escHtml(sub.title)}" oninput="tools[${i}].subtools[${j}].title=this.value;renderOutput()" placeholder="Title" style="flex:1" />
+              <input type="text" value="${escHtml(sub.url)}" oninput="tools[${i}].subtools[${j}].url=this.value;renderOutput()" placeholder="/module/path" style="flex:1" />
+              <input type="text" value="${escHtml(sub.description||'')}" oninput="tools[${i}].subtools[${j}].description=this.value;renderOutput()" placeholder="Description" style="flex:1.5" />
+              <div class="subtool-role-mini">
+                ${ROLES.map(r => `
+                  <span class="mini-chip ${sub.allowedRoles.includes(r)?'active':''}" onclick="toggleRole(${i},${j},'${r}',!tools[${i}].subtools[${j}].allowedRoles.includes('${r}'));renderEditor();renderOutput()">${r}</span>
+                `).join('')}
+              </div>
+              <button class="btn btn-danger btn-sm" onclick="removeSubtool(${i},${j})">✕</button>
+            </div>
+          `).join('')}
+        </div>
+        ` : ''}
+      </div>
+    </div>
+  `).join('');
+  renderOutput();
+}
+
+// ── Toggle edit area ───────────────────────────────────────────────────────
+function toggleEdit(i) {
+  const el = document.getElementById(`editArea-${i}`);
+  el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+// ── Role toggle ────────────────────────────────────────────────────────────
+function toggleRole(toolIdx, subIdx, role, checked) {
+  const arr = subIdx === -1
+    ? tools[toolIdx].allowedRoles
+    : tools[toolIdx].subtools[subIdx].allowedRoles;
+  if (checked && !arr.includes(role)) arr.push(role);
+  if (!checked) { const idx = arr.indexOf(role); if (idx > -1) arr.splice(idx,1); }
+  renderEditor();
+  renderOutput();
+}
+
+// ── Add / Remove ───────────────────────────────────────────────────────────
+function toggleAddForm() {
+  const f = document.getElementById('addForm');
+  f.style.display = f.style.display === 'none' ? 'block' : 'none';
+  if (f.style.display === 'block') renderNewRolesGrid();
+}
+
+let newSelectedRoles = [];
+function renderNewRolesGrid() {
+  newSelectedRoles = [];
+  document.getElementById('newRolesGrid').innerHTML = ROLES.map(r => `
+    <label class="role-chip" id="newRole-${r}">
+      <input type="checkbox" onchange="toggleNewRole('${r}',this.checked)" />
+      ${r}
+    </label>
+  `).join('');
+}
+
+function toggleNewRole(role, checked) {
+  if (checked) newSelectedRoles.push(role);
+  else newSelectedRoles = newSelectedRoles.filter(r => r !== role);
+  document.getElementById(`newRole-${role}`).classList.toggle('active', checked);
+}
+
+function addTool() {
+  const title = document.getElementById('newTitle').value.trim();
+  if (!title) return alert('Title is required');
+  const url = document.getElementById('newUrl').value.trim();
+  const desc = document.getElementById('newDesc').value.trim();
+  const icon = document.getElementById('newIcon').value.trim();
+  tools.push({ title, url, icon, description: desc, allowedRoles: [...newSelectedRoles], subtools: [] });
+  document.getElementById('newTitle').value = '';
+  document.getElementById('newUrl').value = '';
+  document.getElementById('newDesc').value = '';
+  document.getElementById('newIcon').value = '';
+  toggleAddForm();
+  renderEditor();
+}
+
+function removeTool(i) {
+  tools.splice(i, 1);
+  renderEditor();
+}
+
+function addSubtool(i) {
+  tools[i].subtools.push({ title:'New Subtool', url:'', description:'', allowedRoles:[] });
+  renderEditor();
+}
+
+function removeSubtool(toolIdx, subIdx) {
+  tools[toolIdx].subtools.splice(subIdx, 1);
+  renderEditor();
+}
+
+// ── Generate Output ────────────────────────────────────────────────────────
+function renderOutput() {
+  const code = generateTS();
+  document.getElementById('outputCode').innerHTML = highlight(code);
+}
+
+function generateTS() {
+  // Collect all icons used
+  const icons = [...new Set(tools.filter(t=>t.icon).map(t=>t.icon))];
+
+  // Collect which tools need lazy imports (have component fields — placeholder)
+  const lazyLines = tools.filter(t => t.url && !['Home'].includes(t.title))
+    .map(t => `// const ${toPascal(t.title)} = lazy(() => import("@/pages/${toPascal(t.title)}Page"));`)
+    .join('\n');
+
+  const toolsStr = tools.map(tool => {
+    const hasSubtools = tool.subtools && tool.subtools.length > 0;
+    const lines = [];
+    lines.push('  {');
+    lines.push(`    title: "${tool.title}",`);
+    if (tool.url) lines.push(`    url: "${tool.url}",`);
+    if (tool.icon) lines.push(`    icon: ${tool.icon},`);
+    if (tool.description) lines.push(`    description: "${tool.description}",`);
+    if (tool.allowedRoles && tool.allowedRoles.length > 0)
+      lines.push(`    allowedRoles: [${tool.allowedRoles.map(r=>`"${r}"`).join(', ')}],`);
+    if (tool.url && tool.title !== 'Home')
+      lines.push(`    // component: ${toPascal(tool.title)},`);
+    if (hasSubtools) {
+      lines.push('    subtools: [');
+      tool.subtools.forEach(sub => {
+        lines.push('      {');
+        lines.push(`        title: "${sub.title}",`);
+        lines.push(`        url: "${sub.url}",`);
+        if (sub.description) lines.push(`        description: "${sub.description}",`);
+        if (sub.allowedRoles && sub.allowedRoles.length > 0)
+          lines.push(`        allowedRoles: [${sub.allowedRoles.map(r=>`"${r}"`).join(', ')}],`);
+        lines.push(`        // component: ${toPascal(sub.title)},`);
+        lines.push('      },');
+      });
+      lines.push('    ],');
+    }
+    lines.push('  },');
+    return lines.join('\n');
+  }).join('\n');
+
+  return `import type { ElementType, ComponentType } from "react";
+import {
+${icons.map(ic=>`  ${ic},`).join('\n')}
+} from "lucide-react";
+import { lazy } from "react";
+import type { UserRole } from "./schema";
+
+export interface SubTool {
+  title: string;
+  url: string;
+  description?: string;
+  allowedRoles?: UserRole[];
+  component?: ComponentType;
+}
+
+export interface Tool {
+  title: string;
+  url?: string;
+  description?: string;
+  icon?: ElementType;
+  allowedRoles?: UserRole[];
+  subtools?: SubTool[];
+  component?: ComponentType;
+}
+
+// ---------------------------------------------------------------------------
+// Lazy imports — uncomment when component is ready
+// ---------------------------------------------------------------------------
+${lazyLines}
+
+export const toolsData: Tool[] = [
+${toolsStr}
+];
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+export function hasAccess(
+  userRole: UserRole | undefined,
+  allowedRoles: UserRole[] | undefined
+): boolean {
+  if (!userRole) return false;
+  if (!allowedRoles || allowedRoles.length === 0) return true;
+  return allowedRoles.includes(userRole.toLowerCase() as UserRole);
+}
+`;
+}
+
+// ── Helpers ────────────────────────────────────────────────────────────────
+function toPascal(str) {
+  return str.replace(/[^a-zA-Z0-9]+(.)/g, (_, c) => c.toUpperCase())
+            .replace(/^./, c => c.toUpperCase());
+}
+
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function highlight(code) {
+  return escHtml(code)
+    .replace(/\/\/ .*$/gm, m => `<span class="cm">${m}</span>`)
+    .replace(/\b(import|export|from|const|let|type|interface|function|return|if|true|false)\b/g, m => `<span class="kw">${m}</span>`)
+    .replace(/"([^"]*)"/g, m => `<span class="str">${m}</span>`)
+    .replace(/\b([A-Z][a-zA-Z]+)(?=[:,\s])/g, m => `<span class="typ">${m}</span>`);
+}
+
+function copyOutput() {
+  const code = generateTS();
+  navigator.clipboard.writeText(code).then(() => {
+    const t = document.getElementById('toast');
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2000);
+  });
+}
+
+function downloadOutput() {
+  const blob = new Blob([generateTS()], { type: 'text/typescript' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'tools.ts';
+  a.click();
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────
+renderEditor();
+</script>
+</body>
+</html>
